@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRANSFORMACIÓN DIGITAL</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="./src/favicon.ico">
+</head>
+<body>
+    <aside id="sidebar">
+        <img id="company-logo" src="./src/Logo_blanco.jpg" alt="Logo">
+        <ul id="nav-buttons">
+            <a class="button-main" href="./index.html"><span class="material-symbols-outlined">apartment</span>Proyectos</a>
+            <a class="button-main" href="./ejemplos.html"><span class="material-symbols-outlined">group</span>Ejemplos</a>
+            <a class="button-main" href="./viewer.html"><span class="material-symbols-outlined">3d_rotation</span>Visor IFC</a>
+        </ul>
+    </aside>
+    <main id="content">
+        <dialog id="new-project-modal">
+            <form>
+                <h2>Nuevo Proyecto</h2>
+                <div class="input-list">
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">domain</span>Nombre</label>
+                        <input type="text" placeholder="Incluir el nombre del proyecto.">
+                    </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">tag</span>Código</label>
+                        <input type="text" placeholder="Incluir el código de proyecto.">
+                        <p style="color:#969696; font-size: var(--font-sm); font-style: italic; margin-top: 2px">Nota: Incluir el código de imputación.</p>
+                    </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">description</span>Descripción</label>
+                        <textarea id="Description" name="description" placeholder="Breve descripción de las tareas del proyecto."></textarea>
+                    </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">architecture</span>Tipo</label>
+                        <select id="type">
+                            <option value="ii">Implantación Interna</option>
+                            <option value="ie">Implantación Externa</option>
+                            <option value="dp">Desarrollo de Proyecto</option>
+                            <option value="at">Asistencia Técnica</option>
+                        </select>
+                    </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">not_listed_location</span>Estado</label>
+                        <select id="status">
+                                <option value="of">Oferta</option>
+                                <option value="pe">Pendiente</option>
+                                <option value="ac">Activa</option>
+                                <option value="en">Entregada</option>
+                                <option value="fi">Finalizada</option>
+                        </select>
+                    </div>   
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">calendar_month</span>Fecha de Finalización</label>
+                        <input type="date">
+                    </div>
+                    <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
+                        <button style="background-color: transparent">Cancelar</button>
+                        <button style="background-color:var(--complementary-light);">Aceptar</button>
+                    </div>
+                </div>
+            </form>
+        </dialog>
+        <header>
+                <h2>Projectos</h2>
+            <button class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button></header>
+        </header>
+        <div id="project-list">
+            <a href="./index.html" class="project-card">
+                <div class="card-header">
+                    <p style="background-color: #39ad03; padding: 12px; border-radius: 8px; aspect-ratio: 1;">IN</p>
+                        <div>
+                            <h5>Implantación Interna</h5>
+                            <p>INECO</p>
+                        </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-property">
+                        <p style="color: #212E3F">Número de Proyecto</p>
+                        <p>800993</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Estado</p>
+                        <p>Activo</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Tipo</p>
+                        <p>Implantación de metodología</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Presupuesto</p>
+                        <p>500.000€</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Progreso Estimado</p>
+                        <p>25%</p>
+                    </div>
+                </div>
+            </a>
+            <a href="./index.html" class="project-card">
+                <div class="card-header">
+                    <p style="background-color: #ffb412; padding: 12px; border-radius: 8px; aspect-ratio: 1;">EX</p>
+                        <div>
+                            <h5>Inplantación Externa</h5>
+                            <p>CLIENTE</p>
+                        </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Número de Proyecto</p>
+                        <p>233019</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Estado</p>
+                        <p>Activo</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Tipo</p>
+                        <p>Implantación de metodología</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Presupuesto</p>
+                        <p>200.000€</p>
+                    </div>
+                    <div class="card-property">
+                        <p style="color: #212E3F;">Progreso Estimado</p>
+                        <p>50%</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
+</body>
+</html>
+
