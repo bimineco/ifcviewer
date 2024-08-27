@@ -2,11 +2,15 @@ import { IfcViewerAPI } from 'web-ifc-viewer';
 import { projects } from "./projects.js";
 import { Color } from 'three';
 
+import { selectMaterial } from "./modules/three-utils.js";
+import { decodeIFCString } from "./modules/decode-ifc.js";
+
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({container, backgroundColor: new Color(255,255,255)})
 
 viewer.axes.setAxes();
 viewer.grid.setGrid();
+selectMaterial(viewer);
 
 const currentUrl = window.location.href;
 const url = new URL(currentUrl);
@@ -19,10 +23,8 @@ console.log(currentProject.url)
 viewer.IFC.setWasmPath('wasm/');
 viewer.IFC.loadIfcUrl(currentProject.url);
 
-// Utilidades:
-
+// Utilidades Secciones:
 const clipperButton = document.getElementById('clipper-button');
-
 let clippingPlanesActive = false;
 
 clipperButton.onclick = () => {
@@ -46,3 +48,30 @@ window.onkeydown = (event) => {
         viewer.clipper.deletePlane()
     }
 }
+
+//Dimensions
+let dimensionsActive = false;
+let dimensionsPreviewActive = false;
+
+const measureButton = document.getElementById("measure-button");
+
+measureButton.onclick = () => {
+    if (clippingPlanesActive) {
+        clipperButton.click();
+    }
+    dimensionsActive = !dimensionsActive;
+    dimensionsPreviewActive = !dimensionsPreviewActive;
+
+    viewer.dimensions.active = dimensionsActive;
+    viewer.dimensions.previewActive = dimensionsPreviewActive;
+    measureButton.classList.toggle("active");
+};
+
+window.addEventListener("dblclick", () => {
+    if (dimensionsActive) viewer.dimensions.create();
+});
+
+window.addEventListener("keydown", (event) => {
+    if (event.code === "Delete" && dimensionsActive) viewer.dimensions.delete();
+    viewer.context.renderer.postProduction.update();
+});

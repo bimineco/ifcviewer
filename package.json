@@ -15,8 +15,10 @@
     "rollup": "^2.70.2"
   },
   "dependencies": {
+    "dexie": "^3.2.2",
     "dxf-writer": "^1.17.1",
     "three": "^0.135.0",
+    "web-ifc": "^0.0.35",
     "web-ifc-viewer": "^1.0.207"
   }
 }
