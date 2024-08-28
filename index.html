@@ -19,25 +19,25 @@
     </aside>
     <main id="content">
         <dialog id="new-project-modal">
-            <form>
+            <form id="new-project-form">
                 <h2>Nuevo Proyecto</h2>
                 <div class="input-list">
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">domain</span>Nombre</label>
-                        <input type="text" placeholder="Incluir el nombre del proyecto.">
+                        <input name="name" type="text" placeholder="Incluir el nombre del proyecto.">
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">tag</span>Código</label>
-                        <input type="text" placeholder="Incluir el código de proyecto.">
+                        <input name="code" type="text" placeholder="Incluir el código de proyecto.">
                         <p style="color:#969696; font-size: var(--font-sm); font-style: italic; margin-top: 2px">Nota: Incluir el código de imputación.</p>
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">description</span>Descripción</label>
-                        <textarea id="Description" name="description" placeholder="Breve descripción de las tareas del proyecto."></textarea>
+                        <textarea id="description" name="description" placeholder="Breve descripción de las tareas del proyecto."></textarea>
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">architecture</span>Tipo</label>
-                        <select id="type">
+                        <select name="type" id="type">
                             <option value="ii">Implantación Interna</option>
                             <option value="ie">Implantación Externa</option>
                             <option value="dp">Desarrollo de Proyecto</option>
@@ -46,7 +46,7 @@
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">not_listed_location</span>Estado</label>
-                        <select id="status">
+                        <select name="status" id="status">
                                 <option value="of">Oferta</option>
                                 <option value="pe">Pendiente</option>
                                 <option value="ac">Activa</option>
@@ -56,18 +56,18 @@
                     </div>   
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">calendar_month</span>Fecha de Finalización</label>
-                        <input type="date">
+                        <input name="date" type="date">
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
-                        <button style="background-color: transparent">Cancelar</button>
+                        <button style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
                         <button style="background-color:var(--complementary-light);">Aceptar</button>
                     </div>
                 </div>
             </form>
         </dialog>
         <header>
-                <h2>Projectos</h2>
-            <button class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button></header>
+            <h2>Proyectos en curso</h2>
+            <button id="new-project-btn" class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button></header>
         </header>
         <div id="project-list">
             <a href="./index.html" class="project-card">
@@ -134,6 +134,7 @@
             </a>
         </div>
     </main>
+    <script type="module" src="./src/index.js"></script>
 </body>
 </html>
 

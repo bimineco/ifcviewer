@@ -1,4 +1,4 @@
-import { projects } from "./projects.js";
+import { projects } from "./arrayProject.js";
 
 // Get all cards
 const projectContainer = document.getElementById("project-list");

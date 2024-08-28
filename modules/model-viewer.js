@@ -1,9 +1,9 @@
 import { IfcViewerAPI } from 'web-ifc-viewer';
-import { projects } from "./projects.js";
+import { projects } from "./arrayProject.js";
 import { Color } from 'three';
 
-import { selectMaterial } from "./modules/three-utils.js";
-import { decodeIFCString } from "./modules/decode-ifc.js";
+import { selectMaterial } from "./three-utils.js";
+import { decodeIFCString } from "./decode-ifc.js";
 
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({container, backgroundColor: new Color(255,255,255)})
