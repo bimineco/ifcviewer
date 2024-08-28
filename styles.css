@@ -259,6 +259,7 @@ input:focus, textarea:focus, select:focus {
   outline: 2px solid var(--primary);
 }
 
+
 /* Project details page */
 
 .dashboard-card {

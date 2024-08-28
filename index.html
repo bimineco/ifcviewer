@@ -59,15 +59,31 @@
                         <input name="date" type="date">
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
-                        <button style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
-                        <button style="background-color:var(--complementary-light);">Aceptar</button>
+                        <button id="cancel-project-btn" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
+                        <button type="submit" style="background-color:var(--complementary-light);">Aceptar</button>
                     </div>
                 </div>
             </form>
         </dialog>
+        <dialog id="error-dialog">
+            <form id="custom-error" style="background-color: var(--complementary-light);">
+                <div style="padding: 15px; display: flex; flex-direction: row; align-items: center;">
+                    <span style="font-size: 40px" class="material-symbols-outlined">warning</span>
+                    <h2 style="padding: 0px 15px 0px 15px; border-bottom: 0px;">Error</h2>
+                </div>
+                <div style="padding: 15px;">
+                    <p id="error-msg">Error Text</p>
+                </div>
+                <div style="padding: 15px; display: flex; justify-content: flex-end; align-items: center;">
+                    <button id="cancel-btn" type="button" style="background-color: var(--complementary-dark); color: var(--complementary-light); border: none; outline:none;">Accept</button>
+                </div>
+            </form>
+        </dialog>
         <header>
-            <h2>Proyectos en curso</h2>
-            <button id="new-project-btn" class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button></header>
+            <h2>Proyectos:</h2>
+            <button id="import-project-btn" class="new-button"><span class="material-symbols-outlined">publish</span>Importar JSON</button>
+            <button id="export-project-btn" class="new-button"><span class="material-symbols-outlined">download</span>Descarga JSON</button>
+            <button id="new-project-btn" class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button>
         </header>
         <div id="project-list">
             <a href="./index.html" class="project-card">
@@ -134,7 +150,7 @@
             </a>
         </div>
     </main>
-    <script type="module" src="./src/index.js"></script>
+    <script type="module" src="./src/index.ts"></script>
 </body>
 </html>
 
