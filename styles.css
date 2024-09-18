@@ -102,11 +102,13 @@ button:hover {
 
 /* Sidebar Styles*/
 #sidebar{
+  height: 100vh;
   background-color: var(--background-blue);
   padding: 25px;
   display: flex;
   flex-direction: column;
   row-gap: 40px;  
+
 }
 #nav-buttons{
   display: flex;
@@ -145,6 +147,8 @@ header{
   border-radius: 8px;
   cursor: pointer;
   color: var(--primary);
+  padding: 10px;
+  margin: 0 auto;
 }
 
 .project-card:hover{
@@ -261,9 +265,19 @@ input:focus, textarea:focus, select:focus {
 
 
 /* Project details page */
-
 .dashboard-card {
-  background-color: var(--background-300);
+  background-color: #f8f9fa; /* Fondo claro */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+  padding: 20px;
+  width: 100%; /* Asegura que ocupe el ancho total disponible */
+  max-width: 600px; /* Limita el ancho de las tarjetas */
+  margin: 0 auto; /* Centra las tarjetas */
+}
+
+/* Estilos del progreso */
+.dashboard-card {
+  background-color: var(--background-light);
   border-radius: 8px;
   display: flex;
   flex-direction: column;

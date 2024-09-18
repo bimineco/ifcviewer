@@ -8,6 +8,7 @@ export class ProjectsManager {
         if(this.list.length == 0){
             this.createDefaultProject();
         }
+        this.initPageNavigation();
     }
     newProject(data: IProject) {
         const projectNames = this.list.map(
@@ -23,11 +24,58 @@ export class ProjectsManager {
             throw new Error(`A project with the code: "${data.code}" already exists.`)
         }
         const project = new Project(data)
+        
+        project.ui.addEventListener("click", ()=>{
+            const projectsPage = document.getElementById("projects-page")
+            const detailsPage = document.getElementById("project-details")
+            if (!projectsPage || !detailsPage) {return}
+            projectsPage.style.display = "none"
+            detailsPage.style.display = "flex"
+            this.setDetailsPage(project)
+        })
+
+
         this.ui.append(project.ui)
         this.list.push(project)
         return project
     }
+    private setDetailsPage(project: Project){
+        const detailPage = document.getElementById("project-details")
+        if (!detailPage) {return}
 
+        for (const prop in project){
+            const data = detailPage.querySelector(`[data-project-info='${prop}']`) as HTMLElement;
+            if(!data) {continue;}
+            data.textContent = project[prop].toString();
+
+            if(prop === "progress"){
+                data.textContent+= "%"
+                data.style.width = `${project.progress.toString()}%`;
+            }
+            if(prop === "budget"){
+                data.textContent+="€"
+            }
+        }
+    }
+
+    private initPageNavigation() {
+        document.getElementById("projects-nav-btn")?.addEventListener("click", () => {
+            this.pageNavigator("projects-page");
+        });
+
+        document.getElementById("examples-nav-btn")?.addEventListener("click", () => {
+            this.pageNavigator("examples-page");
+        });
+    }
+
+    pageNavigator(id: string) {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => {
+            if (page instanceof HTMLElement) {
+                page.style.display = page.id === id ? 'flex' : 'none';
+            }
+        });
+    }
     createDefaultProject(){
 
         const defaultData : IProject ={
