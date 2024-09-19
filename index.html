@@ -12,9 +12,9 @@
     <aside id="sidebar">
         <img id="company-logo" src="./src/Logo_blanco.jpg" alt="Logo">
         <ul id="nav-buttons">
-            <a class="button-main" href="./index.html"><span class="material-symbols-outlined">apartment</span>Proyectos</a>
-            <a class="button-main" href="./ejemplos.html"><span class="material-symbols-outlined">group</span>Ejemplos</a>
-            <a class="button-main" href="./viewer.html"><span class="material-symbols-outlined">3d_rotation</span>Visor IFC</a>
+            <a class="button-main" id="projects-nav-btn" href="./index.html"><span class="material-symbols-outlined">apartment</span>Proyectos</a>
+            <a class="button-main" id="examples-nav-btn" href="./ejemplos.html"><span class="material-symbols-outlined">group</span>Ejemplos</a>
+            <a class="button-main" id="viewer-nav-btn" href="./viewer.html"><span class="material-symbols-outlined">3d_rotation</span>Visor IFC</a>
         </ul>
     </aside>
     <main id="content">
@@ -80,74 +80,74 @@
             </form>
         </dialog>
         <header>
-            <h2>Proyectos:</h2>
             <button id="import-project-btn" class="new-button"><span class="material-symbols-outlined">publish</span>Importar JSON</button>
             <button id="export-project-btn" class="new-button"><span class="material-symbols-outlined">download</span>Descarga JSON</button>
             <button id="new-project-btn" class="new-button"><span class="material-symbols-outlined">add</span>Nuevo Proyecto</button>
         </header>
-        <div id="project-list">
-            <a href="./index.html" class="project-card">
-                <div class="card-header">
-                    <p style="background-color: #39ad03; padding: 12px; border-radius: 8px; aspect-ratio: 1;">IN</p>
-                        <div>
-                            <h5>Implantación Interna</h5>
-                            <p>INECO</p>
+        <div class="page" id="projects-page" style="display: flex;">
+            <div id="project-list">
+            </div>
+        </div>
+        <div class="page" id="project-details" style="display: none;">
+            <header style="display:flex; flex-direction: column; padding: 0px">
+                <h2 data-project-info='name'>Name</h2>
+                <p data-project-info='description' style="color: #212E3F">Descripción</p>
+            </header>
+            <div class="main-page-content" style="display: flex; gap: 20px;">
+                <div style="flex-basis:60%; display: flex; flex-direction:column; row-gap: 30px;">
+                    <div class="dashboard-card" style="padding: 30px 5px">
+                        <div class="card-header" style="align-self:auto; justify-content: space-between;">
+                            <p style="font-size:10px; background-color: var(--complementary-dark); padding: 20px; display: flex; align-items: center; justify-content:center; border-radius: 8px; aspect-ratio: 1;">CODE</p>
+                            <p data-project-info='code' style="color: #969696; font-size: var(--font-2xl);">Code</p> 
+                            <button class="secondary-button"><p style="width: 100%;">Edit</p></button>
                         </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-property">
-                        <p style="color: #212E3F">Número de Proyecto</p>
-                        <p>800993</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Estado</p>
-                        <p>Activo</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Tipo</p>
-                        <p>Implantación de metodología</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Presupuesto</p>
-                        <p>500.000€</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Progreso Estimado</p>
-                        <p>25%</p>
-                    </div>
-                </div>
-            </a>
-            <a href="./index.html" class="project-card">
-                <div class="card-header">
-                    <p style="background-color: #ffb412; padding: 12px; border-radius: 8px; aspect-ratio: 1;">EX</p>
-                        <div>
-                            <h5>Inplantación Externa</h5>
-                            <p>CLIENTE</p>
+                        <div class="card-content">
+                            <div class="card-property">
+                                <p style="color: #969696; font-size: var(--font-xl);">Status</p>
+                                <p data-project-info='status'>Active</p>
+                            </div>
+                            <div class="card-property">
+                                <p style="color: #969696; font-size:var(--font-xl)">Type</p>
+                                <p data-project-info='type'>Type</p>
+                            </div>
+                            <div class="card-property">
+                                <p style="color: #969696;font-size:var(--font-xl)">Budget</p>
+                                <p data-project-info='budget'>2.500.000€</p>
+                            </div>
+                            <div class="card-property">
+                                <p style="color: #969696;font-size:var(--font-xl)">Progress</p>
+                            </div>
+                            <div style="background-color:var(--background-white); border-radius:999px; overflow:auto; width:100%">
+                                <div data-project-info='progress' style="background-color: green; width:25%;padding:5px 0; text-align:center">25%</div>
+                            </div>
                         </div>
+                    </div>
+                    <div class="dashboard-card" style="flex-grow: 1; padding: 30px 5px">
+                        <div style="padding: 20px 25px;display:flex; align-items:center; justify-content:space-between">
+                            <h4>To-do</h4>
+                            <div style="display: flex; align-items: center; column-gap:10px; justify-items:end">
+                                <div style="display: flex; align-items: center; column-gap:5px;">
+                                    <span class="material-symbols-outlined">search</span>
+                                    <input type="text" placeholder="Search To-do's by name">
+                                </div>
+                                <span class="material-symbols-outlined">add</span>  
+                            </div>
+                        </div> 
+                        <div style="display: flex; flex-direction:column; padding:20px 20px; row-gap:20px">
+                                <div class="todo-item">
+                                    <div style="display: flex; justify-content:space-between; align-items:center">
+                                        <div style="display: flex; column-gap:15px; align-items:center">
+                                            <span class="material-symbols-outlined" style="background-color:#686868; padding:10px; border-radius:10px;">home_repair_service</span>
+                                            <p>Submit final certification</p>
+                                        </div>
+                                        <p style="text-wrap: nowrap; margin-left:10px;">15/02/24</p>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Número de Proyecto</p>
-                        <p>233019</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Estado</p>
-                        <p>Activo</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Tipo</p>
-                        <p>Implantación de metodología</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Presupuesto</p>
-                        <p>200.000€</p>
-                    </div>
-                    <div class="card-property">
-                        <p style="color: #212E3F;">Progreso Estimado</p>
-                        <p>50%</p>
-                    </div>
-                </div>
-            </a>
+                <iframe src="https://juliangroba.github.io/sampleappIFCjs/01/" frameborder="0" style="flex-basis:40%; background-color: var(--background-white); border-radius:8px"></iframe>
+        </div>
         </div>
     </main>
     <script type="module" src="./src/index.ts"></script>
