@@ -41,7 +41,7 @@ export class Project implements IProject{
     setUI(){
         if (this.ui) {return}
         this.ui = document.createElement('div')
-        this.ui.className = "project.card"
+        this.ui.className = "project-card"
         this.ui.innerHTML = `
         <div class="card-header">
             <p style="background-color: #39ad03; padding: 12px; border-radius: 8px; aspect-ratio: 1;">IN</p>
