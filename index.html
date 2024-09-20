@@ -38,25 +38,30 @@
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">architecture</span>Tipo</label>
                         <select name="type" id="type">
-                            <option value="ii">Implantación Interna</option>
-                            <option value="ie">Implantación Externa</option>
-                            <option value="dp">Desarrollo de Proyecto</option>
-                            <option value="at">Asistencia Técnica</option>
+                            <option value="Implantación Interna">Implantación Interna</option>
+                            <option value="Implantación Externa">Implantación Externa</option>
+                            <option value="Desarrollo de Proyecto">Desarrollo de Proyecto</option>
+                            <option value="Asistencia Técnica">Asistencia Técnica</option>
                         </select>
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">not_listed_location</span>Estado</label>
                         <select name="status" id="status">
-                                <option value="of">Oferta</option>
-                                <option value="pe">Pendiente</option>
-                                <option value="ac">Activa</option>
-                                <option value="en">Entregada</option>
-                                <option value="fi">Finalizada</option>
+                                <option value="Oferta">Oferta</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Activa">Activa</option>
+                                <option value="Entregada">Entregada</option>
+                                <option value="Finalizada">Finalizada</option>
                         </select>
+                    </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">euro_symbol</span>Presupuesto</label>
+                        <input name="budget" id="budget">
                     </div>   
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">calendar_month</span>Fecha de Finalización</label>
                         <input name="date" type="date">
+                        <p style="color:#969696; font-size: var(--font-sm); font-style: italic; margin-top: 2px">Nota: Si no se especifíca fecha se incluirá la del día de hoy.</p>
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
                         <button id="cancel-project-btn" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
@@ -79,6 +84,8 @@
                 </div>
             </form>
         </dialog>
+        <dialog id="edit-project-details">
+        </dialog>
         <header>
             <button id="import-project-btn" class="new-button"><span class="material-symbols-outlined">publish</span>Importar JSON</button>
             <button id="export-project-btn" class="new-button"><span class="material-symbols-outlined">download</span>Descarga JSON</button>
@@ -88,7 +95,7 @@
             <div id="project-list">
             </div>
         </div>
-        <div class="page" id="project-details" style="display: none;">
+        <div class="page" id="project-details" style="display: none;" data-project-id=''>
             <header style="display:flex; flex-direction: column; padding: 0px">
                 <h2 data-project-info='name'>Name</h2>
                 <p data-project-info='description' style="color: #212E3F">Descripción</p>
@@ -98,24 +105,28 @@
                     <div class="dashboard-card" style="padding: 30px 5px">
                         <div class="card-header" style="align-self:auto; justify-content: space-between;">
                             <p style="font-size:10px; background-color: var(--complementary-dark); padding: 20px; display: flex; align-items: center; justify-content:center; border-radius: 8px; aspect-ratio: 1;">CODE</p>
-                            <p data-project-info='code' style="color: #969696; font-size: var(--font-2xl);">Code</p> 
-                            <button class="secondary-button"><p style="width: 100%;">Edit</p></button>
+                            <p data-project-info='code' style="color: #969696; font-size: var(--font-2xl);">Código</p> 
+                            <button id="edit-project-btn" class="secondary-button"><p style="width: 100%;">Editar</p></button>
                         </div>
                         <div class="card-content">
                             <div class="card-property">
-                                <p style="color: #969696; font-size: var(--font-xl);">Status</p>
+                                <p style="color: #969696; font-size: var(--font-xl);">Estado</p>
                                 <p data-project-info='status'>Active</p>
                             </div>
                             <div class="card-property">
-                                <p style="color: #969696; font-size:var(--font-xl)">Type</p>
+                                <p style="color: #969696; font-size:var(--font-xl)">Tipo</p>
                                 <p data-project-info='type'>Type</p>
                             </div>
                             <div class="card-property">
-                                <p style="color: #969696;font-size:var(--font-xl)">Budget</p>
-                                <p data-project-info='budget'>2.500.000€</p>
+                                <p style="color: #969696;font-size:var(--font-xl)">Presupuesto</p>
+                                <p data-project-info='budget'>0.000.000€</p>
                             </div>
                             <div class="card-property">
-                                <p style="color: #969696;font-size:var(--font-xl)">Progress</p>
+                                <p style="color: #969696;font-size:var(--font-xl)">Fecha de Finalización</p>
+                                <p data-project-info='date'>01/01/2020</p>
+                            </div>
+                            <div class="card-property">
+                                <p style="color: #969696;font-size:var(--font-xl)">Progreso</p>
                             </div>
                             <div style="background-color:var(--background-white); border-radius:999px; overflow:auto; width:100%">
                                 <div data-project-info='progress' style="background-color: green; width:25%;padding:5px 0; text-align:center">25%</div>

@@ -149,10 +149,18 @@ header{
   color: var(--primary);
   padding: 10px;
   margin: 0 auto;
+  min-width: 350px;
 }
 
 .project-card:hover{
   outline: 2px solid var(--primary);
+}
+
+.card-icon{
+  color: white;
+  padding: 12px; 
+  border-radius: 8px; 
+  aspect-ratio: 1;
 }
 
 .card-header{
