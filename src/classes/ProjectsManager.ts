@@ -15,7 +15,7 @@ export class ProjectsManager {
             this.createDefaultProject();
         }
         this.initPageNavigation();
-        this.initEditButtonInDetails();
+
     }
 
     newProject(data: IProject) {
@@ -172,19 +172,6 @@ export class ProjectsManager {
     }
     // Editar el proyecto:
 
-    initEditButtonInDetails() {
-        const editButton = document.getElementById('edit-project-btn');
-        if (editButton) {
-            editButton.addEventListener('click', () => {
-                const currentProject = this.getCurrentProject();
-                if (currentProject) {
-                    this.openEditProjectModal(currentProject);
-                }
-            });
-        } else {
-            console.error("No se encontró el botón de editar dentro de project-details.");
-        }
-    }
     getCurrentProject(): Project | null {
         const projectId = document.querySelector('[data-project-id]')?.getAttribute('data-project-id');
         if (!projectId) {
@@ -194,7 +181,7 @@ export class ProjectsManager {
         return this.list.find(project => project.id === projectId) || null;
     }
 
-    openEditProjectModal(project: Project){
+    EditProjectModal(project: Project){
         if (!this.editProjectModal) {return}
 
         const projectName = document.querySelector('[data-project-info="name"]')?.textContent || '';

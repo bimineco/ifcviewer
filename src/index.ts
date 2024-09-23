@@ -104,3 +104,13 @@ if (importProjectsBtn) {
         projectsManager.importToJSON()
     })
 }
+
+const editProjectBtn = document.getElementById('edit-project-btn')
+    if (editProjectBtn) {
+        editProjectBtn.addEventListener('click', () =>{
+            const editProject = projectsManager.getCurrentProject()
+            if (editProject){
+                projectsManager.EditProjectModal(editProject)
+            }   
+        })
+    }
