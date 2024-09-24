@@ -1,5 +1,7 @@
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
 import { ProjectsManager} from "./classes/ProjectsManager"
+import { IToDo, ToDoStatus } from "./classes/ToDo";
+import { ToDoManager } from "./classes/ToDoManager";
 
 // Funciones
 function showModal(id: string) {
@@ -54,7 +56,7 @@ if(newProjectBtn){
 }
 
 // Botón de cancelar:
-const cancel = document.getElementById('cancel-project-btn');
+const cancel = document.getElementById('cancel-btn');
 
 // Seleccionar el formulario:
 const projectListUI = document.getElementById("project-list") as HTMLElement;
@@ -105,6 +107,8 @@ if (importProjectsBtn) {
     })
 }
 
+// Editar el proyecto:
+
 const editProjectBtn = document.getElementById('edit-project-btn')
     if (editProjectBtn) {
         editProjectBtn.addEventListener('click', () =>{
@@ -113,4 +117,41 @@ const editProjectBtn = document.getElementById('edit-project-btn')
                 projectsManager.EditProjectModal(editProject)
             }   
         })
-    }
+}
+
+// Añadir To-Do:
+
+const newToDoBtn = document.getElementById('new-to-do-btn');
+if (newToDoBtn){
+    newToDoBtn.addEventListener('click', () => {
+        showModal("new-to-do-modal")})
+    }else{ console.warn("New To-Do Button not Found")
+}
+
+const toDoForm = document.getElementById('new-to-do-form');
+if (toDoForm && toDoForm instanceof HTMLFormElement){
+    toDoForm.addEventListener('submit', (event)=>{
+        event.preventDefault()
+        const formData = new FormData(toDoForm);
+        const toDoForm: ITodo = {
+            name: formData.get("name") as string,
+            user: formData.get("user") as string,
+            description: formData.get("description") as string,
+            status: formData.get("status") as ToDoStatus,
+            date: new Date(formData.get("date") as string)
+        }
+        try{
+            const toDo = ToDoManager.newToDo(toDoData);
+            toDoForm.reset()
+            toggleModal("new-to-do-modal")
+        } catch(err){
+            launchError(err);
+        }
+    })
+        cancel?.addEventListener('click', (event)=>{
+            toDoForm.reset();
+            toggleModal("new-to-do-modal");
+        })
+    } else {
+    console.warn("The to-do form was not found. Check the ID!");
+}

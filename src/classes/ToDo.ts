@@ -1,13 +1,15 @@
-export type ToDoStatus = "Activa" | "Cerrada" | "Pendiente"
+export type ToDoStatus = "Activa" | "Cerrada" | "Pendiente" | "Entregada" | "En proceso"
 
 export interface IToDo {
     name: string
+    user: string
     description: string
     status: ToDoStatus
     date: string
 } 
 export class ToDo implements IToDo{
     name: string
+    user: string
     description: string
     status: ToDoStatus
     date: string
@@ -15,9 +17,7 @@ export class ToDo implements IToDo{
     //Internals
     id: string
     ui: HTMLDivElement
-
-    /*
-    Pendiente de revisar la información.
+    
     constructor(data: IToDo){
         for (const key in data){
             if(key === "ui"){
@@ -29,11 +29,7 @@ export class ToDo implements IToDo{
         this.setUI()
     }
     setUI(){
-        //Comprobación del largo del nombre:
-        if (this.name.length < 5) {
-            throw new Error(`A project with the name: "${this.name}" has less than five (5) characters.`)
-            return; 
-        }
+
         // Incluir un valor predefinido a la fecha:
         let inputDate = (document.querySelector('input[name="date"]') as HTMLInputElement).value;
 
@@ -62,51 +58,19 @@ export class ToDo implements IToDo{
         this.date = formattedDate;
         }
 
-        //Crear el project-card
+        //Crear el todo-item
         if (this.ui) {return}
 
-        //Incluir las dos primeras letras y el color al azar:
-        const iconLetters = this.name.slice(0,2).toUpperCase()
-        const colors = ['#0000FF', '#000FFF', '#00FF00', '#FFFF00', '#FFA500', '#FF0000']
-        const randomColor = colors[Math.floor(Math.random() * colors.length)]
-
         this.ui = document.createElement('div')
-        this.ui.className = "project-card"
-        this.ui.setAttribute('data-project-id', this.id)
+        this.ui.className = "to-do-item"
+        this.ui.setAttribute('to-do-item-id', this.id)
         this.ui.innerHTML = `
-        <div class="card-header">
-            <p class="card-icon" style="background-color: ${randomColor}">${iconLetters}</p>
-                <div>
-                    <h5>${this.name}</h5>
-                    <p>${this.description}</p>
-                </div>
+        <div style="display: flex; justify-content:space-between; align-items:center">
+        <div style="display: flex; column-gap:15px; align-items:center">
+            <span class="material-symbols-outlined" style="background-color:#686868; padding:10px; border-radius:10px;">home_repair_service</span>
+            <p>${this.name}</p>
         </div>
-        <div class="card-content">
-            <div class="card-property">
-                <p style="color: #212E3F">Código de Proyecto</p>
-                <p>${this.code}</p>
-            </div>
-            <div class="card-property">
-                <p style="color: #212E3F;">Estado</p>
-                <p>${this.status}</p>
-            </div>
-            <div class="card-property">
-                <p style="color: #212E3F;">Tipo</p>
-                <p>${this.type}</p>
-            </div>
-            <div class="card-property">
-                <p style="color: #212E3F;">Presupuesto</p>
-                <p>${this.budget}€</p>
-            </div>
-            <div class="card-property">
-                <p style="color: #212E3F;">Fecha de Finalización</p>
-                <p>${this.date}</p>
-            </div>
-            <div class="card-property">
-                <p style="color: #212E3F;">Progreso Estimado</p>
-                <p>${this.progress}%</p>
-            </div>
+        <p style="text-wrap: nowrap; margin-left:10px;">${this.date}</p>
         </div>`
     }
-    */
 }
