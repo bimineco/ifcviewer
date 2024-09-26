@@ -49,27 +49,24 @@ export class Project implements IProject{
 
         if (!inputDate) {
             const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const startDate = `${day}/${month}/${year}`;  
+            const currentYear = today.getFullYear();
+            const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+            const currentDay = String(today.getDate()).padStart(2, '0');
+            const startDate = `${currentDay}/${currentMonth}/${currentYear}`;  
             this.date = startDate; 
         } else {
-            let startDate: Date;
+            let selectedDate: Date;
 
-            if (typeof this.date === 'string') {
-                const [day, month, year] = this.date.split('/').map(Number);
-                startDate = new Date(year, month - 1, day);
-            } else {
-                startDate = this.date;
-            }
-        // Format the date to DD/MM/YYYY
-        const year = startDate.getFullYear();
-        const month = String(startDate.getMonth() + 1).padStart(2, '0');
-        const day = String(startDate.getDate()).padStart(2, '0');
-        const formattedDate = `${day}/${month}/${year}`;
+            const [selectedYear, selectedMonth, selectedDay] = inputDate.split('-').map(Number);
+            selectedDate = new Date(selectedYear, selectedMonth - 1, selectedDay);
 
-        this.date = formattedDate;
+            // Format the date to DD/MM/YYYY
+            const formattedYear = selectedDate.getFullYear();
+            const formattedMonth = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const formattedDay = String(selectedDate.getDate()).padStart(2, '0');
+            const formattedDate = `${formattedDay}/${formattedMonth}/${formattedYear}`;
+
+            this.date = formattedDate;
         }
 
         //Crear el project-card

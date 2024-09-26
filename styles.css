@@ -312,14 +312,14 @@ input:focus, textarea:focus, select:focus {
   outline: none;
 }
 
-.todo-item {
+.to-do-item {
   padding: 20px;
   background-color: var(--complementary-light);
   border-radius: 10px;
   cursor: pointer;
 }
 
-.todo-item:hover {
+.to-do-item:hover {
   background-color: var(--primary);
 }
 

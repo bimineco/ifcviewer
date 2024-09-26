@@ -39,11 +39,9 @@ function launchError(msg: string){
         const placeholderElement = document.getElementById("error-msg");
         if(placeholderElement) {placeholderElement.innerHTML = msg}
         else{console.log("Error: No encontrado donde incluir el error.")}
-        modal.showModal();
-        const cancelError = document.getElementById('cancel-btn');
-        cancelError?.addEventListener('click', (event)=>{
-            closeModal("error-dialog");
-        })
+        if (!modal.open) {
+            modal.showModal();
+        }
     }
 }
 
@@ -127,13 +125,15 @@ if (newToDoBtn){
         showModal("new-to-do-modal")})
     }else{ console.warn("New To-Do Button not Found")
 }
+const toDoListUI = document.getElementById("to-do-container") as HTMLElement
+const toDoManager = new ToDoManager(toDoListUI);
 
 const toDoForm = document.getElementById('new-to-do-form');
 if (toDoForm && toDoForm instanceof HTMLFormElement){
     toDoForm.addEventListener('submit', (event)=>{
         event.preventDefault()
         const formData = new FormData(toDoForm);
-        const toDoForm: ITodo = {
+        const toDoData: IToDo = {
             name: formData.get("name") as string,
             user: formData.get("user") as string,
             description: formData.get("description") as string,
@@ -141,7 +141,7 @@ if (toDoForm && toDoForm instanceof HTMLFormElement){
             date: new Date(formData.get("date") as string)
         }
         try{
-            const toDo = ToDoManager.newToDo(toDoData);
+            const toDo = toDoManager.newToDo(toDoData);
             toDoForm.reset()
             toggleModal("new-to-do-modal")
         } catch(err){

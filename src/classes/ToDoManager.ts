@@ -25,7 +25,7 @@ newToDo(data: IToDo){
 
     this.ui.append(toDo.ui)
     this.list.push(toDo)
-    
+
     return toDo
     }
 
@@ -48,6 +48,7 @@ createDefaultToDo(){
 
         const defaultToDo = this.newToDo(defaultData);
         this.defaultToDoId = defaultToDo.id
+
     }
 
 
