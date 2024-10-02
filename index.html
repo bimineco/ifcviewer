@@ -64,7 +64,7 @@
                         <p style="color:#969696; font-size: var(--font-sm); font-style: italic; margin-top: 2px">Nota: Si no se especifíca fecha se incluirá la del día de hoy.</p>
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
-                        <button id="cancel-btn" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
+                        <button id="cancel-btn-project" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
                         <button type="submit" style="background-color:var(--complementary-light);">Aceptar</button>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                     <p id="error-msg">Error Text</p>
                 </div>
                 <div style="padding: 15px; display: flex; justify-content: flex-end; align-items: center;">
-                    <button id="cancel-btn" type="button" style="background-color: var(--complementary-dark); color: var(--complementary-light); border: none; outline:none;" onclick="document.getElementById('error-dialog').close()">Accept</button>
+                    <button id="accept-btn-error" type="button" style="background-color: var(--complementary-dark); color: var(--complementary-light); border: none; outline:none;" onclick="document.getElementById('error-dialog').close()">Accept</button>
                 </div>
             </form>
         </dialog>
@@ -96,12 +96,21 @@
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">person_add</span>Usuario</label>
-                        <textarea id="user" name="description" placeholder="Usuario a asignar."></textarea>
+                        <textarea id="user" name="user" placeholder="Usuario a asignar."></textarea>
                     </div>
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">description</span>Descripción</label>
                         <textarea id="description" name="description" placeholder="Breve descripción de la tarea en cuestion."></textarea>
                     </div>
+                    <div class="form-field-container">
+                        <label><span class="material-symbols-outlined">priority</span>Prioridad</label>
+                        <select name="priority" id="priority">
+                                <option value="N/A">N/A</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                        </select>
+                    </div> 
                     <div class="form-field-container">
                         <label><span class="material-symbols-outlined">not_listed_location</span>Estado</label>
                         <select name="status" id="status">
@@ -118,12 +127,16 @@
                         <p style="color:#969696; font-size: var(--font-sm); font-style: italic; margin-top: 2px">Nota: Si no se especifíca fecha se incluirá la del día de hoy.</p>
                     </div>
                     <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 15px;">
-                        <button id="cancel-btn" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
+                        <button id="cancel-btn-to-do" type="button" style="background-color: transparent; color: var(--complementary-light)">Cancelar</button>
                         <button type="submit" style="background-color:var(--complementary-light);">Aceptar</button>
                     </div>
                 </div>
             </form>
         </dialog>
+        <!-- TO DO DETAILS MODAL
+        <dialog id="edit-to-do-details">
+        </dialog>
+        -->
         <header>
             <button id="import-project-btn" class="new-button"><span class="material-symbols-outlined">publish</span>Importar JSON</button>
             <button id="export-project-btn" class="new-button"><span class="material-symbols-outlined">download</span>Descarga JSON</button>
@@ -138,12 +151,12 @@
                 <h2 data-project-info='name'>Name</h2>
                 <p data-project-info='description' style="color: #212E3F">Descripción</p>
             </header>
-            <div class="main-page-content" style="display: flex; gap: 20px;">
+            <div class="main-page-content" style="display: flex; gap: 20px;">         
                 <div style="flex-basis:60%; display: flex; flex-direction:column; row-gap: 30px;">
                     <div class="dashboard-card" style="padding: 30px 5px">
                         <div class="card-header" style="align-self:auto; justify-content: space-between;">
                             <p style="font-size:10px; background-color: var(--complementary-dark); padding: 20px; display: flex; align-items: center; justify-content:center; border-radius: 8px; aspect-ratio: 1;">CODE</p>
-                            <p data-project-info='code' style="color: #969696; font-size: var(--font-2xl);">Código</p> 
+                            <p id="project-code" data-project-info='code' style="color: #969696; font-size: var(--font-2xl);">Código</p> 
                             <button id="edit-project-btn" class="secondary-button"><p style="width: 100%;">Editar</p></button>
                         </div>
                         <div class="card-content">
@@ -184,7 +197,6 @@
                         </div> 
                         <div id ="to-do-list">
                             <div id="to-do-container" style="display: flex; flex-direction:column; padding:20px 20px; row-gap:20px">
-
                             </div>
                         </div>
                     </div>

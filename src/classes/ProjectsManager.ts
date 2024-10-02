@@ -1,9 +1,12 @@
 import { IProject, Project } from "./Project"
+import { DateFunctions } from "./DateFunctions"
 export class ProjectsManager {
     list: Project[] = []
     ui: HTMLElement
     defaultProjectId: string | null = null;
     editProjectModal: HTMLDialogElement | null;
+    // Auxiliar para To-dos:
+    public projectCode: string | null; 
 
     constructor(container: HTMLElement){
         this.ui = container
@@ -53,12 +56,14 @@ export class ProjectsManager {
             this.deleteProject(this.defaultProjectId);
             this.defaultProjectId = null;
         }
-
         return project
     }
     private setDetailsPage(project: Project){
         const detailPage = document.getElementById("project-details")
         if (!detailPage) {return}
+
+        const dashboardCard = detailPage.querySelector('.dashboard-card') as HTMLElement;
+        dashboardCard.setAttribute('data-project-id', project.id);
 
         for (const prop in project){
             const data = detailPage.querySelector(`[data-project-info='${prop}']`) as HTMLElement;
@@ -73,6 +78,9 @@ export class ProjectsManager {
                 data.textContent+="€"
             }
         }
+        // Revisar si lo necesito para los ToDos
+        this.projectCode = project.code
+        console.log(this.projectCode)   
     }
 
     private initPageNavigation() {
@@ -170,10 +178,13 @@ export class ProjectsManager {
         })
         input.click()
     }
+
     // Editar el proyecto:
 
     getCurrentProject(): Project | null {
-        const projectId = document.querySelector('[data-project-id]')?.getAttribute('data-project-id');
+        const porjectDetails = document.getElementById("project-details");
+        const projectId = porjectDetails?.querySelector('[data-project-id]')?.getAttribute('data-project-id');
+        console.log(projectId)
         if (!projectId) {
             console.error("No se pudo obtener el ID del proyecto actual.");
             return null;
@@ -183,17 +194,25 @@ export class ProjectsManager {
 
     EditProjectModal(project: Project){
         if (!this.editProjectModal) {return}
+        
+        const projectDetails = document.querySelector('#project-details');
+        if (!projectDetails) {return}
 
-        const projectName = document.querySelector('[data-project-info="name"]')?.textContent || '';
-        const projectCode = document.querySelector('[data-project-info="code"]')?.textContent || '';
-        const projectDescription = document.querySelector('[data-project-info="description"]')?.textContent || '';
-        const projectType = document.querySelector('[data-project-info="type"]')?.textContent || '';
-        const projectStatus = document.querySelector('[data-project-info="status"]')?.textContent || '';
-        const projectBudget = document.querySelector('[data-project-info="budget"]')?.textContent || '';
-        const projectDate = document.querySelector('[data-project-info="date"]')?.textContent || '';
-        const projectProgress = document.querySelector('[data-project-info="progress"]')?.textContent || '';
+        const projectName = projectDetails.querySelector('[data-project-info="name"]')?.textContent || '';
+        const projectCode = projectDetails.querySelector('[data-project-info="code"]')?.textContent || '';
+        const projectDescription = projectDetails.querySelector('[data-project-info="description"]')?.textContent || '';
+        const projectType = projectDetails.querySelector('[data-project-info="type"]')?.textContent || '';
+        const projectStatus = projectDetails.querySelector('[data-project-info="status"]')?.textContent || '';
+        const projectBudget = projectDetails.querySelector('[data-project-info="budget"]')?.textContent || '';
+        const projectDate = projectDetails.querySelector('[data-project-info="date"]')?.textContent || '';
+        const projectProgress = projectDetails.querySelector('[data-project-info="progress"]')?.textContent || '';
 
-        const formattedDate = this.formatDateToInput(projectDate);
+
+        const dateFunctions = new DateFunctions();
+        const formattedDate = dateFunctions.formatDateToInput(projectDate);
+
+
+        console.log(projectName, projectCode, projectDescription, projectType, projectStatus, projectBudget, projectDate, projectProgress);
 
         this.editProjectModal.innerHTML = `
             <form id="edit-project-form">
@@ -259,6 +278,7 @@ export class ProjectsManager {
 
         document.getElementById('edit-project-form')?.addEventListener('submit', (event) => {
             event.preventDefault();
+            console.log('Formulario enviado, llamando a saveProjectChanges'); // Depuración
             this.saveProjectChanges();
         });
     }
@@ -289,31 +309,10 @@ export class ProjectsManager {
             });
         }
     }
-    formatDateToInput(dateString) {
-        const parts = dateString.split('/');
-        if (parts.length === 3) {
-            const day = parts[0];
-            const month = parts[1];
-            const year = parts[2];
-            
-            return `${year}-${month}-${day}`;
-        }
-        return '';
-    }
-    formatDate(date) {
-        if (!date) {
-            throw new Error('Fecha no válida');
-        }
-        
-        const [year, month, day] = date.split('-').map(Number); // Suponiendo el formato YYYY-MM-DD
-        if (isNaN(year) || isNaN(month) || isNaN(day)) {
-            throw new Error('Fecha no válida');
-        }
     
-        const formattedDate = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
-        return formattedDate;
-    }
     saveProjectChanges() {
+        
+        
         const updatedName = (document.querySelector('#edit-project-form input[name="name"]') as HTMLInputElement)?.value;
         const updatedCode = (document.querySelector('#edit-project-form input[name="code"]') as HTMLInputElement)?.value;
         const updatedDescription = (document.querySelector('#edit-project-form textarea[name="description"]') as HTMLTextAreaElement)?.value;
@@ -327,28 +326,36 @@ export class ProjectsManager {
             this.showErrorDialog (`El progeso debe estar entre 0 y 100%.`)
         }
         
-        const formattedDate = this.formatDate(updatedDate)
+        const dateFunctions = new DateFunctions();
+        const formattedDate = dateFunctions.formatDate(updatedDate)
 
         console.log(updatedName, updatedCode, updatedDescription, updatedType, updatedStatus, updatedBudget, updatedDate, updatedProgress);
 
-        document.querySelector('[data-project-info="name"]')!.textContent = updatedName;
-        document.querySelector('[data-project-info="code"]')!.textContent = updatedCode;
-        document.querySelector('[data-project-info="description"]')!.textContent = updatedDescription;
-        document.querySelector('[data-project-info="type"]')!.textContent = updatedType;
-        document.querySelector('[data-project-info="status"]')!.textContent = updatedStatus;
-        document.querySelector('[data-project-info="budget"]')!.textContent = updatedBudget;
-        document.querySelector('[data-project-info="date"]')!.textContent = formattedDate;
+        const projectDetails = document.querySelector('#project-details');
+        if (!projectDetails) {return}
+
+        projectDetails.querySelector('[data-project-info="name"]')!.textContent  = updatedName;
+        projectDetails.querySelector('[data-project-info="code"]')!.textContent = updatedCode;
+        projectDetails.querySelector('[data-project-info="description"]')!.textContent = updatedDescription;
+        projectDetails.querySelector('[data-project-info="type"]')!.textContent = updatedType;
+        projectDetails.querySelector('[data-project-info="status"]')!.textContent = updatedStatus;
+        projectDetails.querySelector('[data-project-info="budget"]')!.textContent = updatedBudget;
+        projectDetails.querySelector('[data-project-info="date"]')!.textContent  = formattedDate;
+        
 
         //Asegurarmen que existe el elemento de progreso:
-        const progressElement = document.querySelector('[data-project-info="progress"]');
+        const progressElement = projectDetails.querySelector('[data-project-info="progress"]');
         if (progressElement) {
             (progressElement as HTMLElement).textContent = updatedProgress;
-            (progressElement as HTMLElement).style.width = updatedProgress; 
+            const progressValue = updatedProgress.replace('%', ''); // Elimina el símbolo % de la cadena
+            (progressElement as HTMLElement).style.width = `${progressValue}%`; // Asigna el valor numérico y la unidad de medida
+            console.log(progressElement)
         } else {
             console.error('Elemento de progreso no encontrado');
             this.showErrorDialog('Elemento de progreso no encontrado.');
         }
 
         this.editProjectModal?.close();
+
     }
 }

@@ -84,34 +84,34 @@ export class Project implements IProject{
         <div class="card-header">
             <p class="card-icon" style="background-color: ${randomColor}">${iconLetters}</p>
                 <div>
-                    <h5>${this.name}</h5>
-                    <p>${this.description}</p>
+                    <h5 data-project-info='name'>${this.name}</h5>
+                    <p data-project-info='description'>${this.description}</p>
                 </div>
         </div>
         <div class="card-content">
             <div class="card-property">
                 <p style="color: #212E3F">Código de Proyecto</p>
-                <p>${this.code}</p>
+                <p id="project-code" data-project-info='code'>${this.code}</p>
             </div>
             <div class="card-property">
                 <p style="color: #212E3F;">Estado</p>
-                <p>${this.status}</p>
+                <p data-project-info='code'>${this.status}</p>
             </div>
             <div class="card-property">
                 <p style="color: #212E3F;">Tipo</p>
-                <p>${this.type}</p>
+                <p data-project-info='type'>${this.type}</p>
             </div>
             <div class="card-property">
                 <p style="color: #212E3F;">Presupuesto</p>
-                <p>${this.budget}€</p>
+                <p data-project-info='budget'>${this.budget}€</p>
             </div>
             <div class="card-property">
                 <p style="color: #212E3F;">Fecha de Finalización</p>
-                <p>${this.date}</p>
+                <p data-project-info='date'>${this.date}</p>
             </div>
             <div class="card-property">
                 <p style="color: #212E3F;">Progreso Estimado</p>
-                <p>${this.progress}%</p>
+                <p data-project-info='progress'>${this.progress}%</p>
             </div>
         </div>`
     }

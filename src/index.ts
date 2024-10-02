@@ -1,7 +1,8 @@
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
 import { ProjectsManager} from "./classes/ProjectsManager"
-import { IToDo, ToDoStatus } from "./classes/ToDo";
+import { IToDo, ToDoStatus, ToDoPriority } from "./classes/ToDo";
 import { ToDoManager } from "./classes/ToDoManager";
+import { DateFunctions } from "./classes/DateFunctions"
 
 // Funciones
 function showModal(id: string) {
@@ -43,6 +44,7 @@ function launchError(msg: string){
             modal.showModal();
         }
     }
+    
 }
 
 // Seleccionar el boton
@@ -52,9 +54,16 @@ if(newProjectBtn){
 } else{
     console.warn("New Project Button not Found");
 }
-
-// Botón de cancelar:
+// Botón de cancelar errores
 const cancel = document.getElementById('cancel-btn');
+
+// Botón de cancelar Proyecto:
+const cancelProject = document.getElementById('cancel-btn-project');
+if(cancelProject){
+    cancelProject.addEventListener("click", () => {closeModal("new-project-modal")});
+} else{
+    console.warn("Cancel Button not Found");
+}
 
 // Seleccionar el formulario:
 const projectListUI = document.getElementById("project-list") as HTMLElement;
@@ -111,6 +120,7 @@ const editProjectBtn = document.getElementById('edit-project-btn')
     if (editProjectBtn) {
         editProjectBtn.addEventListener('click', () =>{
             const editProject = projectsManager.getCurrentProject()
+            //console.log(editProject)
             if (editProject){
                 projectsManager.EditProjectModal(editProject)
             }   
@@ -125,6 +135,28 @@ if (newToDoBtn){
         showModal("new-to-do-modal")})
     }else{ console.warn("New To-Do Button not Found")
 }
+
+// Ampliar información To-Do:
+window.onload = function() {
+    const showMoreBtn = document.getElementById('show-more-to-do-btn');
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', () => {
+        console.log("Evento agregado correctamente");
+        const showToDo = toDoManager.showPopupToDo();
+        });
+    } else {
+        console.log("Botón no encontrado");
+    }
+};
+
+// Botón de cancelar to-dp:
+const cancelToDo = document.getElementById('cancel-btn-to-do');
+if(cancelToDo){
+    cancelToDo.addEventListener("click", () => {closeModal("new-to-do-modal")});
+} else{
+    console.warn("Cancel Button not Found");
+}
+
 const toDoListUI = document.getElementById("to-do-container") as HTMLElement
 const toDoManager = new ToDoManager(toDoListUI);
 
@@ -138,6 +170,7 @@ if (toDoForm && toDoForm instanceof HTMLFormElement){
             user: formData.get("user") as string,
             description: formData.get("description") as string,
             status: formData.get("status") as ToDoStatus,
+            priority: formData.get("priority") as ToDoPriority,
             date: new Date(formData.get("date") as string)
         }
         try{
@@ -154,4 +187,16 @@ if (toDoForm && toDoForm instanceof HTMLFormElement){
         })
     } else {
     console.warn("The to-do form was not found. Check the ID!");
+}
+
+// Editar el to-do:
+
+const editToDoBtn = document.getElementById('edit-to-do-btn')
+    if (editToDoBtn) {
+        editToDoBtn.addEventListener('click', () =>{
+            const editTodo = toDoManager.getcurrentToDo()
+            if (editTodo){
+                toDoManager.EditToDoModal(editTodo)
+            }   
+        })
 }

@@ -323,6 +323,96 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--primary);
 }
 
+/* POP-UP */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: var(--background-light);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  width: 50%;
+  max-width: 400px;
+  color: var(--primary);
+  text-align: center;
+  justify-content: space-between;
+}
+
+.popup-content h2 {
+  margin-bottom: 20px;
+}
+
+.popup-content .info {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.popup-content .info p {
+  margin-bottom: 5px;
+  text-align: left;
+  justify-content: space-between;
+}
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.label-name {
+  font-weight: bold;
+  margin-right: 20px; 
+}
+
+.label-value {
+  margin-left: auto;
+}
+/*
+.label-value-description {
+  flex-grow: 1;
+}
+*/
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 10px;
+}
+
+.popup .edit-btn, .close-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color:var(--complementary-dark);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.popup .edit-btn:hover, .close-btn:hover {
+  background-color: var(--background-blue);
+}
+
+
+
+
+
+
+
+
+
+
+
 /* INECO */
 
 #viewer-container {
