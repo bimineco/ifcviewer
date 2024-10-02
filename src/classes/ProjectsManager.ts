@@ -347,9 +347,7 @@ export class ProjectsManager {
         const progressElement = projectDetails.querySelector('[data-project-info="progress"]');
         if (progressElement) {
             (progressElement as HTMLElement).textContent = updatedProgress;
-            const progressValue = updatedProgress.replace('%', ''); // Elimina el símbolo % de la cadena
-            (progressElement as HTMLElement).style.width = `${progressValue}%`; // Asigna el valor numérico y la unidad de medida
-            console.log(progressElement)
+            (progressElement as HTMLElement).style.width = updatedProgress;
         } else {
             console.error('Elemento de progreso no encontrado');
             this.showErrorDialog('Elemento de progreso no encontrado.');
