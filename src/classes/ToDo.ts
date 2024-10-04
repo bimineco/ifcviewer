@@ -1,3 +1,4 @@
+
 export type ToDoStatus = "Activa" | "Cerrada" | "Pendiente" | "Entregada" | "En proceso"
 export type ToDoPriority = "N/A" |"Baja" | "Media" | "Alta"
 
@@ -92,24 +93,25 @@ export class ToDo implements IToDo{
         const color = statusColors[this.status]
         const colorPriority = priorityColors[this.priority]
 
+        
         this.ui = document.createElement('div')
         this.ui.className = "to-do-item"
-        this.ui.setAttribute('to-do-item-id', this.id)
+        this.ui.setAttribute('data-to-do-id', this.id)
         this.ui.style.backgroundColor  = priorityColors[this.priority];
         this.ui.innerHTML = `
         <div style="display: flex; justify-content:space-between; align-items:center">
             <div style="display: flex; column-gap:15px; align-items:center">
-                <span class="material-symbols-outlined" style="background-color:${color}; padding:10px; border-radius:10px;">home_repair_service</span>
-                <p to-do-info='name'>${this.name}</p>
+                <button class="show-more-to-do" data-to-do-id="${this.id}" style="background-color:${color}; padding:10px; border-radius:10px;"><span class="material-symbols-outlined">folder_open</span></button>    
+                <p data-to-do-info='name'>${this.name}</p>
             </div>
-            <p to-do-info='date' style="text-wrap: nowrap; margin-left:10px;">${this.date}</p>
-            <button id="show-more-to-do-btn"><span class="material-symbols-outlined">folder_open</span></button>
+            <p data-to-do-info='date' style="text-wrap: nowrap; margin-left:10px;">${this.date}</p>
             <div class="additional-info" style="display: none;">
-                <p to-do-info='user'>Usuario: ${this.user}</p>    
-                <p to-do-info='description'>Descripción: ${this.description}</p>
-                <p to-do-info='status'>Estado: ${this.status}</p>
-                <p to-do-info='priority'>Prioridad: ${this.priority}</p>
+                <p data-to-do-info='user'>${this.user || 'Usuario no disponible'}</p>    
+                <p data-to-do-info='description'>${this.description || 'Descripción no disponible'}</p>
+                <p data-to-do-info='status'>${this.status || 'Estado no disponible'}</p>
+                <p data-to-do-info='priority'>${this.priority || 'Prioridad no disponible'}</p>
             </div>
-        </div>`
+        </div>`   
     }
+
 }
