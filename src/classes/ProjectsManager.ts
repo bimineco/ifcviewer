@@ -1,5 +1,17 @@
 import { IProject, Project } from "./Project"
 import { DateFunctions } from "./DateFunctions"
+import { ToDoStatus, ToDoPriority } from "./ToDo"
+import { ToDoManager } from "./ToDoManager"
+
+interface ToDo {
+    name: string;
+    user: string;
+    description: string;
+    status: ToDoStatus;
+    priority: ToDoPriority;
+    date: string;
+    id: string;
+}
 export class ProjectsManager {
     list: Project[] = []
     ui: HTMLElement
@@ -141,11 +153,39 @@ export class ProjectsManager {
     }
 
     exportToJSON(fileName: string = "projects"){
+
         function replacer(key, value) {
             // Filtering out properties  
             if (key === "ui") {return undefined;}
             return value}
-        const json = JSON.stringify(this.list, null, 2)
+        // Obtener los todos:
+        const project = document.querySelector('#project-details');
+        const toDos = project?.querySelectorAll('.to-do-item');
+        
+        const toDoList : ToDo[] = [];
+        toDos?.forEach((toDoElement) => {
+            const ToDo: ToDo = {
+                name: toDoElement.querySelector('[data-to-do-info="name"]')?.textContent ?? '',
+                user: toDoElement.querySelector('[data-to-do-info="user"]')?.textContent ?? '',
+                description: toDoElement.querySelector('[data-to-do-info="description"]')?.textContent ?? toDoElement.querySelector('.description')?.textContent ?? '',
+                status: toDoElement.querySelector('[data-to-do-info="status"]')?.textContent as ToDoStatus ?? toDoElement.querySelector('.status')?.textContent as ToDoStatus,
+                priority: toDoElement.querySelector('[data-to-do-info="priority"]')?.textContent as ToDoPriority ?? toDoElement.querySelector('.priority')?.textContent as ToDoPriority,
+                date: toDoElement.querySelector('[data-to-do-info="date"]')?.textContent ?? '',
+                id: toDoElement.getAttribute('data-to-do-id') ?? '',
+            };
+            toDoList.push(ToDo);
+        });
+        const dataToExport = {
+            projects: this.list.map((project) => {
+                const projectToDos = toDoList.filter((toDo) => toDo.id.startsWith(project.code));
+                return {
+                ...project,
+                toDos: projectToDos
+                };
+            })
+        };
+
+        const json = JSON.stringify(dataToExport, null, 2)
         const blob = new Blob([json],{type: 'application/json'})
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -162,14 +202,22 @@ export class ProjectsManager {
         reader.addEventListener('load', () => {
             const json = reader.result
             if(!json) {return}
-            const projects: IProject[] = JSON.parse(json as string)
+            const data = JSON.parse(json as string)
+            const projects = data.projects;
             for (const project of projects) {
-                try{
-                    this.newProject(project)
-                }catch (err){
+            try{
+                this.newProject(project);
+                project.toDos.forEach((toDo) => {
+                    const container: HTMLElement = document.getElementById('to-do-container') ?? document.body;
+                    if (container) {
+                        const toDoManager = new ToDoManager(container!);
+                        toDoManager.newToDo(toDo);
+                    }
+            });
+            }catch (err){
 
-                }
             }
+        }
         })
         input.addEventListener('change', () => {
             const fileList = input.files
