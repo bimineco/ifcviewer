@@ -1,6 +1,6 @@
 import { IProject, Project } from "./Project"
 import { DateFunctions } from "./DateFunctions"
-import { ToDoStatus, ToDoPriority } from "./ToDo"
+import { ToDoStatus, ToDoPriority, ToDo } from "./ToDo"
 import { ToDoManager } from "./ToDoManager"
 
 interface ToDo {
@@ -154,15 +154,34 @@ export class ProjectsManager {
 
     exportToJSON(fileName: string = "projects"){
 
-        function replacer(key, value) {
-            // Filtering out properties  
+        function replacer(key, value) { 
             if (key === "ui") {return undefined;}
             return value}
-        // Obtener los todos:
-        const project = document.querySelector('#project-details');
-        const toDos = project?.querySelectorAll('.to-do-item');
         
-        const toDoList : ToDo[] = [];
+        const projectDetails = (document.querySelector('#project-details') as HTMLElement);
+        let updatedProject = null 
+        console.log(projectDetails.style.display)
+        if (projectDetails && projectDetails.style.display !== 'none') {
+            const code = projectDetails.querySelector('[data-project-info="code"]')?.textContent;
+            console.log(code)
+            if (code) {
+                updatedProject = {
+                    name: projectDetails.querySelector('[data-project-info="name"]')?.textContent ?? '',
+                    code: code ?? '',
+                    description: projectDetails.querySelector('[data-project-info="description"]')?.textContent ?? '',
+                    type: projectDetails.querySelector('[data-project-info="type"]')?.textContent as "Implantación Interna" | "Implantación Externa" | "Desarrollo de Proyecto" | "Asistencia Técnica" ?? '',
+                    status: projectDetails.querySelector('[data-project-info="status"]')?.textContent as "Oferta" | "Pendiente" | "Activa" | "Entregada" | "Finalizada" ?? '',
+                    date: projectDetails.querySelector('[data-project-info="date"]')?.textContent ?? '',
+                    id: projectDetails.querySelector('[data-project-info="id"]')?.textContent ?? '',
+                    budget: parseFloat((projectDetails.querySelector('[data-project-info="budget"]')?.textContent ?? '').replace('€', '').trim()) || 0,
+                    progress: parseFloat((projectDetails.querySelector('[data-project-info="progress"]')?.textContent ?? '').replace('%', '').trim()) || 0,
+                };
+            }
+        }
+        
+        const toDos = projectDetails.querySelectorAll('.to-do-item');
+        
+        let toDoList : ToDo[] = [];
         toDos?.forEach((toDoElement) => {
             const ToDo: ToDo = {
                 name: toDoElement.querySelector('[data-to-do-info="name"]')?.textContent ?? '',
@@ -174,9 +193,28 @@ export class ProjectsManager {
                 id: toDoElement.getAttribute('data-to-do-id') ?? '',
             };
             toDoList.push(ToDo);
+            console.log(ToDo)
         });
+
         const dataToExport = {
             projects: this.list.map((project) => {
+                if (updatedProject && project.code === updatedProject.code) {
+                    const mergedProject = {
+                        ...project,
+                        name: updatedProject!.name || project.name,
+                        description: updatedProject!.description || project.description,
+                        type: updatedProject!.type || project.type,
+                        status: updatedProject!.status || project.status,
+                        date: updatedProject!.date || project.date,
+                        id: updatedProject!.id || project.id,
+                        budget: updatedProject!.budget || project.budget,
+                        progress: updatedProject!.progress || project.progress,
+                        toDos: toDoList  
+                };
+                return mergedProject;
+                }      
+                //Pendiente de ver como voy a guardar los todos cuando el proyecto
+                //no está visible.
                 const projectToDos = toDoList.filter((toDo) => toDo.id.startsWith(project.code));
                 return {
                 ...project,
@@ -185,7 +223,7 @@ export class ProjectsManager {
             })
         };
 
-        const json = JSON.stringify(dataToExport, null, 2)
+        const json = JSON.stringify(dataToExport, replacer, 2)
         const blob = new Blob([json],{type: 'application/json'})
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -194,36 +232,89 @@ export class ProjectsManager {
         a.click()
         URL.revokeObjectURL(url)
     }
+    
+
+    //Auxiliar:
+    setTextIfExists(element: HTMLElement | null, text: string) {
+        if (element) {
+            element.textContent = text;
+        }
+    }
+
     importToJSON(fileName: string = "projects"){
+        const existingInput = document.querySelector('input[type="file"]');
+        if (existingInput) {
+            console.warn('El input ya existe. No se creará uno nuevo.');
+            return;
+        }
         const input = document.createElement('input')
         input.type = 'file'
         input.accept ='application/json'
-        const reader = new FileReader()
-        reader.addEventListener('load', () => {
-            const json = reader.result
-            if(!json) {return}
-            const data = JSON.parse(json as string)
-            const projects = data.projects;
-            for (const project of projects) {
-            try{
-                this.newProject(project);
-                project.toDos.forEach((toDo) => {
-                    const container: HTMLElement = document.getElementById('to-do-container') ?? document.body;
-                    if (container) {
-                        const toDoManager = new ToDoManager(container!);
-                        toDoManager.newToDo(toDo);
-                    }
-            });
-            }catch (err){
 
-            }
+        const cargaJson = (event: Event) => {
+            const fileList = input.files;
+            if (!fileList) return; 
+            const reader = new FileReader()
+            reader.addEventListener('load', () => {
+
+                const json = reader.result
+                if(!json) {return}
+                const data = JSON.parse(json as string)
+                const projects = data.projects;
+
+                for (const project of projects) {
+                    const existingProject = this.list.find(p => p.id === project.id);
+                    console.log("Buscando proyecto con id:", project.id);
+                    console.log("Proyecto existente:", existingProject);
+                    if (existingProject) {
+
+                        existingProject.name = project.name || existingProject.name;
+                        existingProject.code = project.code || existingProject.code;
+                        existingProject.description = project.description || existingProject.description;
+                        existingProject.type = project.type || existingProject.type;
+                        existingProject.status = project.status || existingProject.status;
+                        existingProject.date = project.date || existingProject.date;
+                        existingProject.budget = project.budget || existingProject.budget;
+                        existingProject.progress = project.progress || existingProject.progress;
+
+                        const projectDetail = document.querySelector('#project-details');
+                        if (projectDetail) {
+                            const toDos = projectDetail?.querySelectorAll('.to-do-item');
+                            if (toDos) {
+                                for (const toDo of  project.toDos) {
+                                    const existingToDo = Array.from(toDos).find(t => t.getAttribute('data-to-do-id') === toDo.id);
+                                    if (existingToDo) {
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="name"]'), toDo.name);
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="user"]'), toDo.user);
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="description"]'), toDo.description);
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="status"]'), toDo.status);
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="priority"]'), toDo.priority);
+                                        this.setTextIfExists(existingToDo.querySelector('[data-to-do-info="date"]'), toDo.date);
+                                        const toDoButton = existingToDo.querySelector('.show-more-to-do') as HTMLButtonElement;
+                                        if (toDoButton) {
+                                            toDoButton.setAttribute('data-to-do-id', toDo.id);
+                                        }
+                                    }
+                                }
+                            }
+                        } 
+                    } else {
+                        this.newProject(project);
+                        project.toDos.forEach((toDo) => {
+                            const container: HTMLElement = document.getElementById('to-do-container') ?? document.body;
+                            if (container) {
+                                const toDoManager = new ToDoManager(container!);
+                                toDoManager.newToDo(toDo);
+                            } else {
+                                console.error('No se encontró el contenedor de To-Dos');
+                            }
+                        })
+                    }
+                }
+            })
+            reader.readAsText(fileList[0]);
         }
-        })
-        input.addEventListener('change', () => {
-            const fileList = input.files
-            if (!fileList) {return}
-            reader.readAsText(fileList[0])
-        })
+        input.addEventListener('change', cargaJson);
         input.click()
     }
 
