@@ -178,17 +178,12 @@ if (toDoForm && toDoForm instanceof HTMLFormElement){
 
 toDoListUI.addEventListener('mouseenter', () => {
     document.querySelectorAll('.show-more-to-do').forEach(button => {
-
         if (!(button as HTMLElement).getAttribute('data-event-added')) {
             button.addEventListener('click', function() {
                 const toDoId = (this as HTMLElement).getAttribute('data-to-do-id');
                 console.log(`ID del To-Do: ${toDoId}`);
-
                 if (toDoId !==null) {
-                    
                     const popToDo = toDoManager.showPopUpToDo(toDoId);
-                    
-
                     const toDo = toDoManager.getToDo(toDoId);
                     if (toDo && popToDo) {
                         const editBtn = popToDo.querySelector('#edit-to-do-btn');
@@ -200,10 +195,7 @@ toDoListUI.addEventListener('mouseenter', () => {
                         } else {
                             console.error("No se encontró el botón de editar en el popup.");
                         }
-
-
                         const closeBtn = popToDo.querySelector('#close-to-do-btn');
-                        console.log(closeBtn)
                         if (closeBtn) {
                             closeBtn.addEventListener('click', () => {
                                 popToDo.remove();
@@ -211,92 +203,49 @@ toDoListUI.addEventListener('mouseenter', () => {
                         } else {
                             console.error("No se encontró el botón de cerrar en el popup.");
                         }
-
                     } else {
                         console.error("No se encontró el To-Do con ID:", toDoId);
                     }
                 }   
             });
-
             (button as HTMLElement).setAttribute('data-event-added', 'true');
         }
-
     });
 });
-/*
-function addEditEvent(popup: HTMLElement, toDo: ToDo) {
 
-    const editBtn = popup.querySelector('#edit-to-do-btn');
-    if (editBtn) {
-        editBtn.addEventListener('click', () => {
-            popup.remove();
-            toDoManager.EditToDoModal(toDo);
-        },{ once: true });
-    } else {
-        console.error("No se encontró el botón de editar en el popup.");
-    }
+// Usar Filtros:
+document.addEventListener('DOMContentLoaded', () => {
+    const filter = (document.getElementById('search-to-do') as HTMLInputElement);
+    const clearButton = document.getElementById('search-clear') as HTMLSpanElement;
+    if (filter) {
+        filter.addEventListener('input', (event) => {
+            const filterValue = (event.target as HTMLInputElement).value;
+            toDoManager.filterToDos(filterValue);
+            if (filterValue.length > 0) {
+                clearButton.style.display = 'inline';
+            } else {
+                clearButton.style.display = 'none';
+            }
+        });
+        clearButton.addEventListener('click', () => {
+            filter.value = ''; 
+            clearButton.style.display = 'none'; 
+            toDoManager.filterToDos('');
+        });
+
+        filter.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                filter.value = ''; 
+                clearButton.style.display = 'none'; 
+                toDoManager.filterToDos(''); 
+            }
+        });
+    };
+})
+
+const filterAdvancedBtn = (document.getElementById('search-advanced') as HTMLSpanElement)
+if (filterAdvancedBtn) {
+    filterAdvancedBtn.addEventListener('click', () => {
+        toDoManager.filterAdvanced();
+    });
 }
-
-toDoListUI.addEventListener('mouseenter', () => {
-    document.querySelectorAll('.show-more-to-do').forEach(button => {
-
-        if (!(button as HTMLElement).getAttribute('data-event-added')) {
-            button.addEventListener('click', function() {
-                const toDoId = (this as HTMLElement).getAttribute('data-to-do-id');
-                console.log(`ID del To-Do: ${toDoId}`);
-
-                if (toDoId !==null) {
-                    const popToDo = toDoManager.showPopupToDo(toDoId);
-                    const toDo = toDoManager.getToDo(toDoId);
-                    const editForm = document.querySelector('edit-to-do');
-                    if (toDo && popToDo) {
-                        addEditEvent(popToDo,toDo)
-                        
-                        const cancelBtn = editForm?.querySelector('#cancel-edit-btn');
-                        console.log(cancelBtn);
-                        cancelBtn?.addEventListener('click', () => {
-                            popToDo.remove();
-                            button.addEventListener('click', function() {
-                                const popToDo = toDoManager.showPopupToDo(toDoId);
-                                const toDo = toDoManager.getToDo(toDoId);
-                
-                                if (toDo && popToDo) {
-                                    addEditEvent(popToDo, toDo);
-                                }
-                            });
-                        });
-                
-                        const acceptBtn = editForm?.querySelector('#accept-edit-btn');
-                        console.log(acceptBtn);
-                        acceptBtn?.addEventListener('click', () => {
-                            popToDo.remove();
-                            button.addEventListener('click', function() {
-                                const popToDo = toDoManager.showPopupToDo(toDoId);
-                                const toDo = toDoManager.getToDo(toDoId);
-                
-                                if (toDo && popToDo) {
-                                    addEditEvent(popToDo, toDo);
-                                }
-                            });   
-                        });
-                        const closeBtn = popToDo.querySelector('#close-to-do-btn');
-                        if (closeBtn) {
-                            closeBtn.addEventListener('click', () => {
-                                popToDo.remove();
-                            });
-                        } else {
-                            console.error("No se encontró el botón de cerrar en el popup.");
-                        }
-                    } else {
-                        console.error("No se encontró el To-Do con ID:", toDoId);
-                    }
-                }
-            });
-
-
-            (button as HTMLElement).setAttribute('data-event-added', 'true');
-        }
-    });
-    
-});
-*/

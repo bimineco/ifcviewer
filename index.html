@@ -184,14 +184,15 @@
                     </div>
                     <div class="dashboard-card" style="flex-grow: 1; padding: 30px 5px">
                         <div style="padding: 20px 25px;display:flex; align-items:center; justify-content:space-between">
-                            <h4>To-do</h4>
+                            <h2 style="color: var(--primary);">Tareas</h2>
                             <div style="display: flex; align-items: center; column-gap:10px; justify-items:end">
-                                <div style="display: flex; align-items: center; column-gap:5px;">
-                                    <span class="material-symbols-outlined">search</span>
-                                    <input type="text" placeholder="Search To-do's by name">
+                                <div style="display: flex; align-items: center; column-gap:5px; position: relative;">
+                                    <button><span class="material-symbols-outlined" id="search-advanced">search</span></button>
+                                    <input id="search-to-do" type="text" placeholder="Buscar tarea por nombre." style="width: 100%; padding-right: 30px;"> <!-- Añadí padding-right para que no cubra el ícono de "X" -->
+                                    <span class="material-symbols-outlined" id="search-clear" style="display:none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">restart_alt</span>
                                 </div>
-                                <button id="new-to-do-btn"><span class="material-symbols-outlined">add</span></button> 
                             </div>
+                            <button id="new-to-do-btn"><span class="material-symbols-outlined">add</span></button> 
                         </div> 
                         <div id ="to-do-list">
                             <div id="to-do-container" style="display: flex; flex-direction:column; padding:20px 20px; row-gap:20px">

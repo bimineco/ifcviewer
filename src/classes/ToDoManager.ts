@@ -1,4 +1,4 @@
-import {IToDo, ToDo} from "./ToDo"
+import {IToDo, ToDo, statusColors, priorityColors} from "./ToDo"
 import { DateFunctions } from "./DateFunctions"
 
 export class ToDoManager {
@@ -20,7 +20,6 @@ export class ToDoManager {
         if(this.list.length == 0){
             this.createDefaultToDo();
         }
-
     }
 
     newToDo(data){
@@ -65,7 +64,6 @@ export class ToDoManager {
 
         const defaultToDo = this.newToDo(defaultData);
         this.defaultToDoId = defaultToDo.id
-
     }
 
     getToDo(id:string) {
@@ -152,7 +150,6 @@ export class ToDoManager {
         return todoId
         
     }
-
 
     // Mostrar más información del to-do:
 
@@ -261,6 +258,30 @@ export class ToDoManager {
         return this.list.find(toDo => toDo.id === toDoId) || null;
     }
 
+    // Actualizar los colores:
+    updateColors(toDo: ToDo) {
+
+        const toDoStatus = toDo.status;
+        let toDoPriority;
+        if(toDoStatus === "Cerrada") {
+            toDoPriority = "N/A"; 
+        }else{
+            toDoPriority = toDo.priority;
+        }
+        
+        const statusColor = statusColors[toDoStatus];
+        const priorityColor = priorityColors[toDoPriority];
+
+        const toDoElement = (document.querySelector(`[data-to-do-id="${toDo.id}"]`) as HTMLDivElement);
+        if (toDoElement) {
+            toDoElement.style.backgroundColor = priorityColor;
+            const buttonElement = (toDoElement.querySelector('button.show-more-to-do') as HTMLButtonElement);
+            if (buttonElement) {
+                buttonElement.style.backgroundColor = statusColor;
+            }
+        }
+    }
+
     EditToDoModal(toDo: ToDo){
         if (!this.editToDoModal) {return}
 
@@ -273,7 +294,7 @@ export class ToDoManager {
 
         const dateFunctions = new DateFunctions();
         const formattedDate = dateFunctions.formatDateToInput(toDoDate);
-
+        
         this.editToDoModal.innerHTML = `
             <form id="edit-to-do-form">
                 <h2>Editar tarea</h2>
@@ -333,8 +354,9 @@ export class ToDoManager {
         });
 
         document.getElementById('edit-to-do-form')?.addEventListener('submit', (event) => {
-            event.preventDefault();
+            event.preventDefault();    
             this.saveToDoChanges(toDoId);
+            this.updateColors(toDo);
             this.viewPopUp(toDoId);
         });
     }
@@ -342,13 +364,18 @@ export class ToDoManager {
         const updatedName = (document.querySelector('#edit-to-do-form input[name="name"]') as HTMLInputElement)?.value.trim();
         const updatedUser = (document.querySelector('#edit-to-do-form textarea[name="user"]') as HTMLTextAreaElement)?.value.trim();
         const updatedStatus = (document.querySelector('#edit-to-do-form select[name="status"]') as HTMLSelectElement)?.value;
-        const updatedPriority = (document.querySelector('#edit-to-do-form select[name="priority"]') as HTMLSelectElement)?.value;
+        let updatedPriority = (document.querySelector('#edit-to-do-form select[name="priority"]') as HTMLSelectElement)?.value;
         const updatedDate = (document.querySelector('#edit-to-do-form input[name="date"]') as HTMLInputElement)?.value;
         const updatedDescription = (document.querySelector('#edit-to-do-form textarea[name="description"]') as HTMLTextAreaElement)?.value.trim();
         
         const dateFunctions = new DateFunctions();
         const formattedDate = dateFunctions.formatDate(updatedDate);
         
+        if (updatedStatus === 'Cerrada') {
+            updatedPriority = 'N/A';
+        }
+
+
         // Obtener el To-Do existente
         const toDo = this.getToDo(toDoId);
         if (toDo) {
@@ -377,8 +404,32 @@ export class ToDoManager {
         this.editToDoModal?.close();
         this.checkPopUp();
     }
-
-
+    // Función para Filtrar dentro del To-Do Container:
+    filterToDos(filter: string) {
+        const toDosContainer = document.getElementById('to-do-container') as HTMLDivElement;
+        const toDos = (toDosContainer?.querySelectorAll('.to-do-item') as NodeListOf<HTMLDivElement>);
+        if (toDos) {
+            toDos.forEach((toDo) => {
+                const toDoName = toDo.querySelector('[data-to-do-info="name"]')?.textContent;
+                if (toDoName) {
+                    const lowerToDoName = toDoName.toLowerCase();
+                    const lowerFilter = filter.toLowerCase();
+                    console.log(lowerFilter)
+                    if (lowerToDoName.startsWith(lowerFilter)) {
+                        toDo.style.display = 'block';
+                    } else if (lowerToDoName.includes(lowerFilter)) {
+                        toDo.style.display = 'block';
+                    } else {
+                        toDo.style.display = 'none';
+                    }
+                } else {
+                    toDo.style.display = 'none';
+                }
+            });
+        }
+    }
+    filterAdvanced() {
+        console.log('Pendiente de Desarrollo');
+    }   
 }
-
 

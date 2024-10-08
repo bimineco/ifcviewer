@@ -2,6 +2,23 @@
 export type ToDoStatus = "Activa" | "Cerrada" | "Pendiente" | "Entregada" | "En proceso"
 export type ToDoPriority = "N/A" |"Baja" | "Media" | "Alta"
 
+// Mapear el status a colores específicos
+export const statusColors: { [key in ToDoStatus]: string } = {
+    "Activa": "#ff9900", // (rojo claro alternativo)
+    "Cerrada": "#8bc34a", // (verde pastel)
+    "Pendiente": "#ffa07a", // (naranja claro)
+    "Entregada": "#686868", // Gris
+    "En proceso": "#03a9f4", // (azul pastel)
+}
+// Mapear la prioridad a los colores
+export const priorityColors: {[key in ToDoPriority]: string} = {
+    "N/A": "#6b96cf", // Var(--complementary-light)
+    "Baja": "#8bc34a", // (verde pastel)
+    "Media": "#ffc107", // (naranja pastel)
+    "Alta": "#ff3737" // (rojo pastel)
+}   
+
+
 export interface IToDo {
     name: string
     user: string
@@ -45,22 +62,6 @@ export class ToDo implements IToDo{
 
     setUI(){
         
-        // Mapear el status a colores específicos
-        const statusColors: { [key in ToDoStatus]: string } = {
-            "Activa": "#f44336", // Rojo
-            "Cerrada": "#4caf50", // Verde
-            "Pendiente": "#ff9800", // Naranja
-            "Entregada": "#686868", // Gris
-            "En proceso": "#2196f3", // Azul
-        }
-        // Mapear la prioridad a los colores
-        const priorityColors: {[key in ToDoPriority]: string} = {
-            "N/A": "#6b96cf", // Var(--complementary-light)
-            "Baja": "#4caf55", // Verde
-            "Media": "#ff9805", // Naranja
-            "Alta": "#f44346", // Rojo
-        }   
-
         // Incluir un valor predefinido a la fecha:
         let inputDate = (document.querySelector('input[name="date-to-do"]') as HTMLInputElement).value;
 
