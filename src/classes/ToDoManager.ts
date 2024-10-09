@@ -6,14 +6,11 @@ export class ToDoManager {
     ui: HTMLElement
     defaultToDoId: string | null = null;
     editToDoModal: HTMLDialogElement | null;
-    correlativo: number = 0; // Correlativo inicial
+    private correlativo: number = 0;
     
-    
-
     constructor(container: HTMLElement){
-        
+
         this.ui = container   
-        
         // Edición de To-Do:
         this.editToDoModal = document.getElementById('edit-to-do') as HTMLDialogElement | null
 
@@ -24,11 +21,10 @@ export class ToDoManager {
 
     newToDo(data){
 
-    const todoId = this.generateToDoID(); // Generar el ID
-    // Crear el objeto con el ID generado
+    const todoId = this.generateToDoID(); 
     const todoData: IToDo = {
         ...data, 
-        id: todoId // Agregar el ID generado
+        id: todoId
     };
     const toDo = new ToDo(todoData)
 
@@ -123,8 +119,26 @@ export class ToDoManager {
         })
     }
 
-
     // Crear un id para ToDo:
+
+    getLastCorrelative(correlativo: number): number {
+        let maxCorrelativo = correlativo
+        const toDoItems = document.querySelectorAll('.to-do-item');
+
+        if (toDoItems.length === 0) { return 0; }
+
+        toDoItems.forEach((item: Element) => {
+            const id = item.getAttribute('data-to-do-id');
+            if (id) {
+                const numeroCalculado = parseInt(id.split('-')[1], 10);
+                if (!isNaN(numeroCalculado) && numeroCalculado > maxCorrelativo) {
+                    maxCorrelativo = numeroCalculado;
+                }
+            }
+        });
+
+        return maxCorrelativo;
+    }
     generateToDoID(): string{
 
         // Obtner el código de proyecto:    
@@ -139,13 +153,14 @@ export class ToDoManager {
             console.error("El código del proyecto está vacío.");
             return '';
         }
+        
+        this.correlativo = this.getLastCorrelative(this.correlativo);
         const correlativoStr = this.correlativo.toString().padStart(3, '0');
 
         // Estructura
         const todoId = `${projectCode}-${correlativoStr}`;
         
         this.correlativo++; 
-        
         //console.log('ID del to-do generado:', todoId);
         return todoId
         
