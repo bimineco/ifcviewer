@@ -10,6 +10,7 @@ export interface IProject {
     type: ProjectType
     status: ProjectStatus
     date: string
+
 } 
 export class Project implements IProject{
     // To satisfy the IProject
@@ -19,6 +20,7 @@ export class Project implements IProject{
     type: "Implantación Interna" | "Implantación Externa" | "Desarrollo de Proyecto" | "Asistencia Técnica"
     status: "Oferta" | "Pendiente" | "Activa" | "Entregada" | "Finalizada"
     date: string
+
 
     // Class internals
     ui: HTMLDivElement
@@ -44,6 +46,7 @@ export class Project implements IProject{
             throw new Error(`A project with the name: "${this.name}" has less than five (5) characters.`)
             return; 
         }
+        this.budget = (document.querySelector('input[name="budget"]') as HTMLInputElement).value !== '' ? parseFloat((document.querySelector('input[name="budget"]') as HTMLInputElement).value) : 0;
         // Incluir un valor predefinido a la fecha:
         let inputDate = (document.querySelector('input[name="date"]') as HTMLInputElement).value;
 

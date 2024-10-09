@@ -41,14 +41,22 @@ export class ToDo implements IToDo{
     id: string
     ui: HTMLDivElement
     
-    constructor(data: IToDo){
+    static idCounter: number = 1;
+
+    constructor(data: IToDo & { id?: string }){
         for (const key in data){
             if(key === "ui"){
                 continue
             }
             this[key] = data[key]
         }
-    
+        if (data.id) {
+            this.id = data.id; 
+        } else {
+            this.id = `to-do-${ToDo.idCounter.toString().padStart(3, '0')}`;
+            ToDo.idCounter++; 
+        }
+        
         this.setUI()
     }
     edit(data: IToDo) {
@@ -98,7 +106,7 @@ export class ToDo implements IToDo{
         this.ui = document.createElement('div')
         this.ui.className = "to-do-item"
         this.ui.setAttribute('data-to-do-id', this.id)
-        this.ui.style.backgroundColor  = priorityColors[this.priority];
+        this.ui.style.backgroundColor  = colorPriority;
         this.ui.innerHTML = `
         <div style="display: flex; justify-content:space-between; align-items:center">
             <div style="display: flex; column-gap:15px; align-items:center">

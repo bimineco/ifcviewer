@@ -1,6 +1,6 @@
 import { IProject, Project } from "./Project"
 import { DateFunctions } from "./DateFunctions"
-import { ToDoStatus, ToDoPriority, ToDo } from "./ToDo"
+import { ToDoStatus, ToDoPriority, IToDo } from "./ToDo"
 import { ToDoManager } from "./ToDoManager"
 
 interface ToDo {
@@ -300,11 +300,21 @@ export class ProjectsManager {
                         } 
                     } else {
                         this.newProject(project);
+                        let idCounter = 1;
                         project.toDos.forEach((toDo) => {
                             const container: HTMLElement = document.getElementById('to-do-container') ?? document.body;
                             if (container) {
                                 const toDoManager = new ToDoManager(container!);
-                                toDoManager.newToDo(toDo);
+                                
+                                // Si no hay ID en el toDo:
+                                const generatedId = `${project.code}-${String(idCounter).padStart(3, '0')}`;
+                                idCounter++;  
+                                
+                                const toDoData: IToDo ={
+                                    ...toDo,
+                                    id: toDo.id ?? generatedId
+                                }
+                                toDoManager.newToDo(toDoData);
                             } else {
                                 console.error('No se encontró el contenedor de To-Dos');
                             }
