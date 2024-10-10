@@ -257,5 +257,14 @@ if (filterAdvancedBtn) {
 /*--------------------- THREE VIEWER: --------------------------*/
 
 const scene = new THREE.Scene();
-const camera = new.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+scene.background = new THREE.Color(0xffffff);
+
+const viewerContainer = document.getElementById('viewer-container') as HTMLElement;
+const containerDimensions = viewerContainer.getBoundingClientRect();
+const aspectRatio = containerDimensions.width / containerDimensions.height;
+
+const camera = new THREE.PerspectiveCamera(75, aspectRatio);
 const renderer = new THREE.WebGLRenderer();
+viewerContainer.append(renderer.domElement);
+renderer.setSize(containerDimensions.width, containerDimensions.height);
+renderer.render(scene, camera);

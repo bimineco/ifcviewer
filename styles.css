@@ -379,11 +379,7 @@ input:focus, textarea:focus, select:focus {
 .label-value {
   margin-left: auto;
 }
-/*
-.label-value-description {
-  flex-grow: 1;
-}
-*/
+
 .buttons {
   display: flex;
   justify-content: space-between;
@@ -405,14 +401,6 @@ input:focus, textarea:focus, select:focus {
 
 
 
-
-
-
-
-
-
-
-
 /* INECO */
 
 #viewer-container {
@@ -429,6 +417,7 @@ input:focus, textarea:focus, select:focus {
 .no-color:hover{
   color: var(--primary);
 }
+
 /* Grid*/
 
 .grid-container{
