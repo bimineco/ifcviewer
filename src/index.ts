@@ -1,10 +1,10 @@
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
 import { ProjectsManager} from "./classes/ProjectsManager"
-import { IToDo, ToDoStatus, ToDoPriority, ToDo } from "./classes/ToDo";
+import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
 import { ToDoManager } from "./classes/ToDoManager";
-import { DateFunctions } from "./classes/DateFunctions"
+import * as THREE from 'three';
 
-// Funciones
+/*--------------------- MODALS: --------------------------*/
 function showModal(id: string) {
     const modal = document.getElementById(id);
     if(modal && modal instanceof HTMLDialogElement){
@@ -46,6 +46,8 @@ function launchError(msg: string){
     }
     
 }
+
+/*--------------------- PROJECTS: --------------------------*/
 
 // Seleccionar el boton
 const newProjectBtn = document.getElementById('new-project-btn');
@@ -125,6 +127,8 @@ const editProjectBtn = document.getElementById('edit-project-btn')
             }   
         })
 }
+
+/*--------------------- TO-DOS: --------------------------*/
 
 // Añadir To-Do:
 const newToDoBtn = document.getElementById('new-to-do-btn');
@@ -249,3 +253,9 @@ if (filterAdvancedBtn) {
         toDoManager.filterAdvanced();
     });
 }
+
+/*--------------------- THREE VIEWER: --------------------------*/
+
+const scene = new THREE.Scene();
+const camera = new.THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
