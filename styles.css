@@ -406,6 +406,8 @@ input:focus, textarea:focus, select:focus {
 #viewer-container {
   width: 100%;
   height: 100vh;
+  overflow: hidden;
+  padding: 0%;
 }
 
 ::placeholder{
@@ -507,6 +509,7 @@ input:focus, textarea:focus, select:focus {
   border-radius: 4px;
 
 }
+/*
 #viewer-container{
   height: 100vh;
   width: 75vw;
@@ -519,6 +522,7 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--background-blue);
   border-radius: 8px;
 }
+*/
 
 /* BOTONES EXPORTACION */
 

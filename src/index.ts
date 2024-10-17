@@ -1,8 +1,15 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {GUI} from 'three/examples/jsm/libs/lil-gui.module.min'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
 import { ProjectsManager} from "./classes/ProjectsManager"
 import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
 import { ToDoManager } from "./classes/ToDoManager";
-import * as THREE from 'three';
+import { color } from 'three/examples/jsm/nodes/Nodes.js';
+
 
 /*--------------------- MODALS: --------------------------*/
 function showModal(id: string) {
@@ -256,15 +263,107 @@ if (filterAdvancedBtn) {
 
 /*--------------------- THREE VIEWER: --------------------------*/
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+const scene = new THREE.Scene()
 
-const viewerContainer = document.getElementById('viewer-container') as HTMLElement;
-const containerDimensions = viewerContainer.getBoundingClientRect();
-const aspectRatio = containerDimensions.width / containerDimensions.height;
+const viewerContainer = document.getElementById("viewer-container") as HTMLElement
 
-const camera = new THREE.PerspectiveCamera(75, aspectRatio);
-const renderer = new THREE.WebGLRenderer();
-viewerContainer.append(renderer.domElement);
-renderer.setSize(containerDimensions.width, containerDimensions.height);
-renderer.render(scene, camera);
+const camera = new THREE.PerspectiveCamera(75)
+camera.position.set(1,2,5)
+
+const renderer = new THREE.WebGLRenderer({alpha:true, antialias: true})
+viewerContainer.append(renderer.domElement)
+
+function resizeViewer(){
+    const containerDimensions = viewerContainer.getBoundingClientRect()
+    renderer.setSize(containerDimensions.width, containerDimensions.height)
+    const aspectRatio = containerDimensions.width/containerDimensions.height
+    camera.aspect = aspectRatio
+    camera.updateProjectionMatrix()
+}
+
+window.addEventListener('resize', resizeViewer)
+resizeViewer()
+
+const boxGeometry = new THREE.BoxGeometry()
+const material = new THREE.MeshStandardMaterial({ 
+    color: getComputedStyle(document.documentElement).getPropertyValue('--complementary-dark'),
+    roughness: 0.5
+})
+const cube = new THREE.Mesh(boxGeometry,material)
+
+const directionalLight = new THREE.DirectionalLight()
+const ambientLight = new THREE.AmbientLight()
+ambientLight.intensity = 0.4
+
+scene.add(cube,ambientLight,directionalLight)
+
+const cameraControls = new OrbitControls(camera, viewerContainer)
+
+function renderScene(){
+    renderer.render(scene,camera)
+    requestAnimationFrame(renderScene)
+}
+
+renderScene()
+
+const axes = new THREE.AxesHelper()
+const grid = new THREE.GridHelper()
+grid.material.transparent = true
+grid.material.opacity = 0.4
+grid.material.color = new THREE.Color("#808080")
+scene.add(axes, grid)
+
+const gui = new GUI()
+//document.body.appendChild(gui.domElement);
+
+const cubeControls = gui.addFolder('Cube')
+cubeControls.add(cube.position, "x", -10,10,1)
+cubeControls.add(cube.position, "y",-10,10,1)
+cubeControls.add(cube.position, "z",-10,10,1)
+cubeControls.add(cube, "visible")
+cubeControls.addColor(cube.material, "color")
+
+const directionalLightControl = gui.addFolder("Directional Light")
+directionalLightControl.add(directionalLight.position, "x", -20,20,0.5)
+directionalLightControl.add(directionalLight.position, "y", -20,20,0.5)
+directionalLightControl.add(directionalLight.position, "z", -20,20,0.5)
+directionalLightControl.add(directionalLight, "visible")
+directionalLightControl.add(directionalLight, "intensity", 0,1,0.1)
+directionalLightControl.addColor(directionalLight, "color")
+
+const ambientLightControl = gui.addFolder("Ambient Light")
+ambientLightControl.add(ambientLight, "visible")
+ambientLightControl.add(ambientLight, "intensity", 0,1,0.1)
+ambientLightControl.addColor(ambientLight, "color")
+
+const objLoader = new OBJLoader()
+const mtlLoader = new MTLLoader()
+
+mtlLoader.load('../models/Gear/Gear1.mtl', (materials) =>{
+    materials.preload()
+    objLoader.setMaterials(materials)
+    objLoader.load('../models/Gear/Gear1.obj', (mesh) =>{
+        mesh.scale.set(0.25,0.25,0.25)
+        mesh.position.set(0,0,-10)
+        scene.add(mesh)
+
+    })
+})
+
+const lighTest = new THREE.DirectionalLight(0xffffff, 1);
+lighTest.position.set(0, 10, 10);
+scene.add(lighTest);
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf',
+    (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(1, 1, 1);  
+        model.position.set(0, 2, 0);     
+        scene.add(model);    
+    },
+    undefined,
+    (error) => {
+        console.error("Error cargando el modelo GLTF:", error);
+    }
+);

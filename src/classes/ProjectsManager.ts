@@ -25,12 +25,27 @@ export class ProjectsManager {
 
         //Para poder editar:
         this.editProjectModal = document.getElementById('edit-project-details') as HTMLDialogElement | null
+        
+        const project = this.newProject({
+            name: "Por Defecto",
+            code: "800800",
+            description: "N/A",
+            type: "Implantación Interna" ,
+            status: "Oferta",
+            date: "12/12/2024"
+        })
+        project.ui.click()
+
+
+        /* Bloquear Temporalmente 
 
         if(this.list.length == 0){
-            this.createDefaultProject();
+            this.createDefaultProject(); 
         }
-        this.initPageNavigation();
 
+        */
+        this.initPageNavigation();
+        
     }
 
     newProject(data: IProject) {
