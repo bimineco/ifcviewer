@@ -13,12 +13,18 @@
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.2.1",
+    "@types/react": "18.2.31",
+    "@types/react-dom": "18.2.14",
     "@types/three": "0.156.0",
+    "@vitejs/plugin-react": "4.0.3",
     "rollup": "^2.70.2",
     "typescript": "^5.5.4",
-    "vite": "^5.4.2"
+    "vite": "^4.2.0"
   },
   "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.18.0",
     "three": "0.152.2",
     "uuid": "^10.0.0"
   }

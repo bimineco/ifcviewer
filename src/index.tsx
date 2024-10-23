@@ -1,17 +1,48 @@
+import * as React from 'react';
+import * as ReactDom from 'react-dom/client';
+import * as Router from 'react-router-dom';
+import { Sidebar } from './react-components/Sidebar';
+import { ProjectPage } from './react-components/ProjectPage';
+import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
+import { ProjectsManager} from "./classes/ProjectsManager"
+import { ToDoManager } from "./classes/ToDoManager";
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {GUI} from 'three/examples/jsm/libs/lil-gui.module.min'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
-import { ProjectsManager} from "./classes/ProjectsManager"
+
 import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
-import { ToDoManager } from "./classes/ToDoManager";
+
 import { color } from 'three/examples/jsm/nodes/Nodes.js';
 
+const projectsManager = new ProjectsManager()
 
-/*--------------------- MODALS: --------------------------*/
+
+/*--------------------- REACT: ---------------------------*/
+
+const rootElement = document.getElementById("app") as HTMLDivElement
+const appRoot = ReactDom.createRoot(rootElement)
+appRoot.render(
+    <>
+        <Router.BrowserRouter>
+            < Sidebar />
+            <Router.Routes>
+                <Router.Route path="/" element={< ProjectPage projectsManager={projectsManager} />}/>
+                <Router.Route path="/project/:id" element={< ProjectDetailsPage projectsManager={projectsManager} />}/>    
+            </Router.Routes>
+        </Router.BrowserRouter>
+    </>
+)
+
+
+
+
+/*--------------------- MODALS: --------------------------
 function showModal(id: string) {
     const modal = document.getElementById(id);
     if(modal && modal instanceof HTMLDialogElement){
@@ -54,7 +85,7 @@ function launchError(msg: string){
     
 }
 
-/*--------------------- PROJECTS: --------------------------*/
+/*--------------------- PROJECTS: --------------------------
 
 // Seleccionar el boton
 const newProjectBtn = document.getElementById('new-project-btn');
@@ -135,7 +166,7 @@ const editProjectBtn = document.getElementById('edit-project-btn')
         })
 }
 
-/*--------------------- TO-DOS: --------------------------*/
+/*--------------------- TO-DOS: --------------------------
 
 // Añadir To-Do:
 const newToDoBtn = document.getElementById('new-to-do-btn');
@@ -261,8 +292,9 @@ if (filterAdvancedBtn) {
     });
 }
 
-/*--------------------- THREE VIEWER: --------------------------*/
+/*--------------------- THREE VIEWER: --------------------------
 
+/* Revisar toda esta parte del código al finalizar el tercer módulo 
 const scene = new THREE.Scene()
 
 const viewerContainer = document.getElementById("viewer-container") as HTMLElement
@@ -313,6 +345,7 @@ grid.material.opacity = 0.4
 grid.material.color = new THREE.Color("#808080")
 scene.add(axes, grid)
 
+/*
 const gui = new GUI()
 //document.body.appendChild(gui.domElement);
 
@@ -335,6 +368,7 @@ const ambientLightControl = gui.addFolder("Ambient Light")
 ambientLightControl.add(ambientLight, "visible")
 ambientLightControl.add(ambientLight, "intensity", 0,1,0.1)
 ambientLightControl.addColor(ambientLight, "color")
+
 
 const objLoader = new OBJLoader()
 const mtlLoader = new MTLLoader()
@@ -367,3 +401,4 @@ gltfLoader.load('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/Dam
         console.error("Error cargando el modelo GLTF:", error);
     }
 );
+*/
