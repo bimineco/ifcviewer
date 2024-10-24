@@ -11,10 +11,10 @@ export function Sidebar(){
                     Proyectos
                 </Router.Link>
 
-                <button className="button-main" id="examples-nav-btn">
+                <Router.Link to={`/users`}  className="button-main" id="examples-nav-btn">
                     <span className="material-symbols-outlined">group</span>
-                    Ejemplos
-                </button>
+                    Usuarios
+                </Router.Link>
 
                 <button className="button-main" id="viewer-nav-btn">
                     <span className="material-symbols-outlined">3d_rotation</span>

@@ -4,6 +4,7 @@ import * as Router from 'react-router-dom';
 import { Sidebar } from './react-components/Sidebar';
 import { ProjectPage } from './react-components/ProjectPage';
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
+import { UserPage } from './react-components/UserPage';
 import { ProjectsManager} from "./classes/ProjectsManager"
 import { ToDoManager } from "./classes/ToDoManager";
 
@@ -24,6 +25,7 @@ appRoot.render(
             <Router.Routes>
                 <Router.Route path="/" element={< ProjectPage projectsManager={projectsManager} />}/>
                 <Router.Route path="/project/:id" element={< ProjectDetailsPage projectsManager={projectsManager} />}/>    
+                <Router.Route path="/users" element={< UserPage />}/>    
             </Router.Routes>
         </Router.BrowserRouter>
     </>
