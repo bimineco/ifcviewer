@@ -20,30 +20,23 @@ export class ProjectsManager {
     editProjectModal: HTMLDialogElement | null;
     // React
     onProjectCreated = (Project: Project) => {}
-    onProjectDeleted = (Project: Project) => {}
+    onProjectDeleted = (id: string) => {}
 
     // Auxiliar para To-dos:
     public projectCode: string | null; 
 
-    constructor(){
+    newProject(data: IProject, id?: string) {
 
-        if(this.list.length == 0){
-            this.createDefaultProject(); 
-        }
+    const existingProjectIndex = this.list.findIndex(project => project.id === id);
+
+    if (existingProjectIndex !== -1) {
+        const existingProject = this.list[existingProjectIndex];
+        this.updateExistingProject(existingProject, data);
         
-    }
+        return existingProject
 
-    newProject(data: IProject) {
-        const dateFunctions = new DateFunctions();
-        /*
-        try {
-            const formattedDate = dateFunctions.formatDateToInput(data.date);
-            data.date = formattedDate;
-        } catch (error) {
-            throw new Error('Invalid date format. Please use YYYY-MM-DD.');
-        }
-        */
-        const project = new Project(data)
+    } else {
+        const project = new Project(data, id)
         this.list.push(project)
         this.onProjectCreated(project)
         
@@ -53,6 +46,8 @@ export class ProjectsManager {
             this.defaultProjectId = null;
         }
         return project
+    }
+    
     }
     
     createDefaultProject(){
@@ -116,7 +111,7 @@ export class ProjectsManager {
             return project.id !== id
         })
         this.list = remaining
-        this.onProjectDeleted(project)
+        this.onProjectDeleted(id)
     }
 
     exportToJSON(projects: any[] , fileName: string = "projects"){
@@ -279,7 +274,7 @@ export class ProjectsManager {
     
     saveProjectChanges(updatedProject: Project) {
         // Buscar y actualizar el proyecto en la lista interna de proyectos
-        const project = this.list.find(p => p.id === updatedProject.id);
+        let project = this.list.find(p => p.id === updatedProject.id);
         if (!project) {
             this.showErrorDialog('No se pudo encontrar el proyecto para guardar los cambios.');
             return;
@@ -291,16 +286,8 @@ export class ProjectsManager {
         }
         const dateFunctions = new DateFunctions
 
-
         // Actualizar los datos del proyecto
-        project.name = updatedProject.name;
-        project.code = updatedProject.code;
-        project.description = updatedProject.description;
-        project.type = updatedProject.type;
-        project.status = updatedProject.status;
-        project.budget = updatedProject.budget;
-        project.date = updatedProject.date;
-        project.progress = updatedProject.progress;
+        project = { ...project, ...updatedProject };
         
         // Actualizar la vista en el detalle del proyecto
         const projectDetails = document.querySelector('#project-details');

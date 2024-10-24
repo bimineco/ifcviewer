@@ -1,9 +1,12 @@
 import * as React from 'react'
 import * as Router from 'react-router-dom'
+import * as Firestore from 'firebase/firestore'
 import { IProject, Project, ProjectStatus, ProjectType } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
 import { SearchBox } from './SearchBox';
+import { getCollection } from "../firebase"
+import { DateFunctions } from '../classes/DateFunctions';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -11,7 +14,6 @@ interface Props {
 export function ProjectPage(props: Props){
     const [projects,setProjects]= React.useState<Project[]>(props.projectsManager.list)
     props.projectsManager.onProjectCreated = () =>{setProjects([...props.projectsManager.list])}
-    props.projectsManager.onProjectDeleted = () =>{setProjects([...props.projectsManager.list])}
     
     const projectCards = projects.map((project) =>{
         return ( // REVISAR
@@ -23,11 +25,30 @@ export function ProjectPage(props: Props){
             <ProjectCard project = {project} key ={project.id} />
         )
     })
-    /*
+    
+    const dateFunctions = new DateFunctions()
+    const projectsCollection = getCollection<IProject>("/projects")
+    const getFirestoneProjects = async () => {
+        const firebaseProjects = await Firestore.getDocs(projectsCollection)
+        for (const doc of firebaseProjects.docs){
+            const data = doc.data()
+            const fecha = dateFunctions.formatDateFirebase((data.date as unknown as Firestore.Timestamp).toDate() as Date)
+            const project: IProject = {
+                ...data,
+                date: fecha
+            }
+            try{
+                props.projectsManager.newProject(project, doc.id)
+            }catch (error){
+
+            }
+        }
+    }
+
     React.useEffect(()=>{
-        console.log("Projects state updated", projects)
-    }, [projects])
-    */
+        getFirestoneProjects()
+    }, [])
+    
     const onNewProjectClick = () => {
         const modal = document.getElementById("new-project-modal");
         if(modal && modal instanceof HTMLDialogElement){
@@ -46,11 +67,13 @@ export function ProjectPage(props: Props){
             type: formData.get("type") as ProjectType,
             status: formData.get("status") as ProjectStatus,
             budget: Number((formData.get("budget") as string).replace('€', '').replace(',', '.')),
-            date: formData.get("date") as string // revisar
+            date: formData.get("date") as string, // revisar
+            progress: 0
         }
         if(!props.projectsManager.checkProject(projectData)) {
         } else {
             try{
+                Firestore.addDoc(projectsCollection, projectData)
                 const project = props.projectsManager.newProject(projectData);
                 projectForm.reset()
                 const modal = document.getElementById("new-project-modal");

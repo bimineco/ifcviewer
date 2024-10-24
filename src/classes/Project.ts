@@ -29,12 +29,12 @@ export class Project implements IProject{
     // Class internals
     id: string
     
-    constructor(data: IProject){
+    constructor(data: IProject, id = uuidv4()){
         // Project data definition
         for (const key in data){
             this[key] = data[key]
         }
-        if(!this.id) {this.id = uuidv4()}
+        this.id = id
         
         // Incluir un valor predefinido a la fecha:
         let inputDate = data.date || "";

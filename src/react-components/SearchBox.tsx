@@ -12,7 +12,7 @@ export function SearchBox(props: Props){
                 onChange={(e)=>{(props.OnChange(e.target.value))}}
                 type='text'
                 placeholder='Incluir el nombre del proyecto'
-                style={{width:"100%", height: "40px", backgroundColor: "var(--background-light)"}}
+                style={{width:"100%", height: "20px", backgroundColor: "var(--background-light)"}}
             />
         </div>
     )

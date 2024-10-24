@@ -6,7 +6,7 @@ import { Project, IProject, ProjectType, ProjectStatus } from '../classes/Projec
 import { DateFunctions } from '../classes/DateFunctions';
 import { ToDoCard } from './ToDoCard'
 import { Viewer } from './Viewer';
-
+import { deleteDocument, updateDocument } from '../firebase'
 interface Props {
     projectsManager: ProjectsManager
 }
@@ -24,6 +24,13 @@ export function ProjectDetailsPage(props: Props){
         alert ("El elemento no es un Proyecto válido para transformar.")
         return (<p>El proyecto con ID {routeParams.id} no se ha podido mostrar.</p>)
     }
+
+    const navigateTo = Router.useNavigate()
+    props.projectsManager.onProjectDeleted = async (id) => {
+        await deleteDocument('/projects', id)
+        navigateTo('/')
+    }
+
     // Aseguramre que la fecha está modificada.
     const dateFunctions = new DateFunctions();
     const formattedDate = new Date(dateFunctions.formatDateToInput(project.date));
@@ -33,10 +40,11 @@ export function ProjectDetailsPage(props: Props){
             actualizarRef.current = updatedProject;
         });
     };
-    const onFormEditProject= (event: React.FormEvent) => {
+    const onFormEditProject= async (event: React.FormEvent) => {
         if (!actualizarRef.current){return}
         try{
             props.projectsManager.saveProjectChanges(actualizarRef.current);
+            await updateDocument<Partial<IProject>>("/projects",project.id,actualizarRef.current)
             const modal = document.getElementById("edit-project-details");
             if(modal && modal instanceof HTMLDialogElement){
                 modal.close();
@@ -175,9 +183,14 @@ export function ProjectDetailsPage(props: Props){
             </dialog>
             <header style={{ display: "flex", flexDirection: "column", padding: 0 }}>
                 <h2 data-project-info="name">{project.name}</h2>
-                <p data-project-info="description" style={{ color: "#212E3F" }}>
-                    {project.description}
-                </p>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                    <p data-project-info="description" style={{ color: "#212E3F", width: "75%", paddingLeft: "50px" }}>
+                        {project.description}
+                    </p>
+                    <button onClick={() => {props.projectsManager.deleteProject(project.id)}} style={{ paddingRight: "50px" }}>
+                        <span className="material-symbols-outlined">delete</span>Borrar
+                    </button>
+                </div>
             </header>
             <div className="main-page-content" style={{ display: "flex", gap: 20 }}>
                 <div
