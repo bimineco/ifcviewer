@@ -3,6 +3,7 @@ import * as Router from 'react-router-dom'
 import { IProject, Project, ProjectStatus, ProjectType } from '../classes/Project';
 import { ProjectsManager } from '../classes/ProjectsManager';
 import { ProjectCard } from './ProjectCard';
+import { SearchBox } from './SearchBox';
 
 interface Props {
     projectsManager: ProjectsManager
@@ -76,6 +77,10 @@ export function ProjectPage(props: Props){
 
     const closeErrorDialog = () =>{
         (document.getElementById('error-dialog') as HTMLDialogElement).close();
+    }
+
+    const onProjectSearch = (value: string) => {
+        setProjects(props.projectsManager.filterProjects(value))
     }
 
     return (
@@ -250,6 +255,7 @@ export function ProjectPage(props: Props){
                 </form>
             </dialog>
             <header>
+                <SearchBox OnChange={(value) => onProjectSearch(value)}/>
                 <button onClick={onImportProjecClick} id="import-project-btn" className="new-button">
                     <span className="material-symbols-outlined">publish</span>Importar JSON
                 </button>
@@ -261,7 +267,10 @@ export function ProjectPage(props: Props){
                 </button>
             </header>
             <div className="page" id="projects-page" style={{display: 'flex'}}>
-                <div id="project-list">{ projectCards }</div>
+                {
+                    projects.length > 0 ? <div id="project-list">{ projectCards }</div> : <p style={{padding: 10}}>No hay ningún proyecto que mostrar.</p> 
+                }
+                
             </div>
         </div>
     )

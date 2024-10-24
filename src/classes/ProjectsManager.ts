@@ -320,4 +320,13 @@ export class ProjectsManager {
             (progressElement as HTMLElement).style.width = `${updatedProject.progress}%`;
         }
     }
+    // Filter Projects
+
+    filterProjects(value:string){
+        const filteredProjects = this.list.filter((project) =>{
+            return project.name.includes(value)
+        })
+        return filteredProjects
+    }
+
 }
