@@ -6,11 +6,24 @@ import { ProjectPage } from './react-components/ProjectPage';
 import { ProjectDetailsPage } from './react-components/ProjectDetailsPage';
 import { UserPage } from './react-components/UserPage';
 import { ProjectsManager} from "./classes/ProjectsManager"
+import * as BUI from "@thatopen/ui"
+
 import { ToDoManager } from "./classes/ToDoManager";
-
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
-
 import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
+
+BUI.Manager.init()
+
+declare global{
+    namespace JSX{
+        interface IntrinsicElements{
+            "bim-grid":any;
+            "bim-label": any;
+            "bim-button": any;
+            "bim-text-input": any
+        }
+    }
+}
 
 const projectsManager = new ProjectsManager()
 

@@ -290,6 +290,7 @@ export class ProjectsManager {
         project = { ...project, ...updatedProject };
         
         // Actualizar la vista en el detalle del proyecto
+        
         const projectDetails = document.querySelector('#project-details');
         if (!projectDetails) return;
 

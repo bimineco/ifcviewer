@@ -21,7 +21,7 @@ export function ProjectCard(props: Props){
                     </p>
                     <div>
                         <h5 data-project-info="name">
-                            {props.project.name}
+                                {props.project.name}
                         </h5>
                         <p data-project-info="description">
                             {props.project.description}

@@ -1,15 +1,5 @@
 import React from 'react'
 import * as BUI from '@thatopen/ui'
-import * as icon from '@iconify/react'
-
-
-declare global{
-    namespace JSX{
-        interface IntrinsicElements{
-            "bim-grid":any
-        }
-    }
-}
 export function UserPage(){
     
     const userTable = BUI.Component.create<BUI.Table>(() => {
@@ -99,33 +89,44 @@ export function UserPage(){
             </div>
         `
     })
-    
+
+    const footer = BUI.Component.create<BUI.Component>(() => {
+        return BUI.html`
+        <div style="display: flex; justify-content: center; vertical-align: middle">
+            <bim-lable>Ingeniería Digital y BIM</bim-lable>
+        </div>
+        `
+    })
+
     const gridLayoyut: BUI.Layouts = {
         primary: {
             template:`
                 "header header" 40px
                 "content sidebar" 1fr
-                "footer footer" 40px
+                "footer footer" 20px
                 / 1fr 60px
             `,
             elements: {
                 header: (()=>{
-                    const header = document.createElement("div")
-                    header.style.backgroundColor = "#641b1b66"
-                    return header
+                    const inputBox = BUI.Component.create<BUI.TextInput>( () => {
+                        return BUI.html`
+                        <bim-text-input style="padding: 8px" placeholder="Search Users">
+                        </bim-text-input>
+                        `
+                    })
+                    inputBox.addEventListener("input", ()=>{
+                        userTable.queryString = inputBox.value
+                    })
+
+                    return inputBox
                 })(),
                 sidebar,
                 content,
-                footer: (()=>{
-                    const footer = document.createElement("div")
-                    footer.style.backgroundColor = "#ff440066"
-                    return footer
-                })(),
+                footer,
             }
         }
     }
     React.useEffect(()=>{
-        BUI.Manager.init()
         const grid = document.getElementById("bimGrid") as BUI.Grid
         grid.layouts = gridLayoyut
         grid.layout = "primary"
@@ -133,7 +134,6 @@ export function UserPage(){
     return(
         <div>
             <bim-grid id="bimGrid">
-
             </bim-grid>
         </div>
     )

@@ -78,7 +78,7 @@ export function ToDoItem(props: Props){
     return(
         <>
             <dialog id="edit-to-do">
-                <form onSubmit={(e) =>{onFormEditTodo(e)}} className="popup-content">
+                <form onSubmit={(e) =>{onFormEditTodo(e)}} className="to-do-content">
                     <h2>
                         {isEditing ? (
                             <input
