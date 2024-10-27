@@ -5,7 +5,7 @@ import { ToDoManager } from '../classes/ToDoManager';
 import { Project, IProject, ProjectType, ProjectStatus } from '../classes/Project';
 import { DateFunctions } from '../classes/DateFunctions';
 import { ToDoCard } from './ToDoCard'
-import { Viewer } from './Viewer';
+import { IFCViewer } from './IFCViewer';
 import { deleteDocument, updateDocument } from '../firebase'
 interface Props {
     projectsManager: ProjectsManager
@@ -285,7 +285,7 @@ export function ProjectDetailsPage(props: Props){
                     </div>
                 < ToDoCard toDoManager={toDoManager} />
                 </div>
-                < Viewer />
+                < IFCViewer />
             </div>
         </div>
     )

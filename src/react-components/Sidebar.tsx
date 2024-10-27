@@ -16,28 +16,11 @@ export function Sidebar(){
                     Usuarios
                 </Router.Link>
 
-                <button className="button-main" id="viewer-nav-btn">
+                <Router.Link to={`/viewer`} className="button-main" id="viewer-nav-btn">
                     <span className="material-symbols-outlined">3d_rotation</span>
                     Visor IFC
-                </button>
-                
+                </Router.Link>
             </ul>
         </aside>
     )
 }
-/*
-<Router.Link to={`/projects`} className="button-main" id="projects-nav-btn">
-    <span className="material-symbols-outlined">apartment</span>
-    Proyectos
-</Router.Link>
-
-<Router.Link to={`/examples`} className="button-main" id="examples-nav-btn">
-    <span className="material-symbols-outlined">group</span>
-    Ejemplos
-</Router.Link>
-
-<Router.Link to={`/viewer`} className="button-main" id="viewer-nav-btn">
-    <span className="material-symbols-outlined">3d_rotation</span>
-    Visor IFC
-</Router.Link>
-*/

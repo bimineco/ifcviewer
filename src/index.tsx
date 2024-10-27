@@ -11,6 +11,7 @@ import * as BUI from "@thatopen/ui"
 import { ToDoManager } from "./classes/ToDoManager";
 import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
 import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
+import { IFCViewer } from './react-components/IFCViewer';
 
 BUI.Manager.init()
 
@@ -20,7 +21,9 @@ declare global{
             "bim-grid":any;
             "bim-label": any;
             "bim-button": any;
-            "bim-text-input": any
+            "bim-text-input": any;
+            "bim-viewport": any;
+        
         }
     }
 }
@@ -38,7 +41,8 @@ appRoot.render(
             <Router.Routes>
                 <Router.Route path="/" element={< ProjectPage projectsManager={projectsManager} />}/>
                 <Router.Route path="/project/:id" element={< ProjectDetailsPage projectsManager={projectsManager} />}/>    
-                <Router.Route path="/users" element={< UserPage />}/>    
+                <Router.Route path="/users" element={< UserPage />}/>
+                <Router.Route path="/viewer" element={< IFCViewer />}/>        
             </Router.Routes>
         </Router.BrowserRouter>
     </>

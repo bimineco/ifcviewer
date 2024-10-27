@@ -362,3 +362,9 @@ header{
     justify-content: space-between;
     margin: 0 10px;
   }
+
+  /* Visor */
+  #viewer-container {
+    width: 100%;
+    height: 100vh;
+  }
