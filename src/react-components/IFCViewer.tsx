@@ -30,12 +30,12 @@ export function IFCViewer(){
         const rendererComponent = new OBCF.PostproductionRenderer(components, viewerContainer)
         world.renderer = rendererComponent
         
-
         const cameraComponent = new OBC.OrthoPerspectiveCamera(components)
         world.camera = cameraComponent
         
         components.init()
         
+        world.renderer.postproduction.enabled = true
         world.camera.controls.setLookAt(3,3,3,0,0,0)
         world.camera.updateAspect()
 
@@ -52,14 +52,13 @@ export function IFCViewer(){
 
             })
         const highlighter = components.get(OBCF.Highlighter)
-        console.log(highlighter)
         highlighter.setup({ 
-        selectName: "selectEventName", 
+        selectName: "selectEvent", // Cuidado que al cambiar esto ya no vale lo que explica JH.
         selectEnabled: true,
-        hoverName: "hoverEventName",
+        hoverName: "hoverEvent",
         hoverEnabled: true,
         selectionColor: new THREE.Color(0xff0000),  
-        hoverColor: new THREE.Color(0x00ff00),     
+        hoverColor: new THREE.Color('#6B96CF'),     
         autoHighlightOnClick: true,
         world: world,
         })
@@ -70,45 +69,11 @@ export function IFCViewer(){
             rendererComponent.resize()
             cameraComponent.updateAspect()
         })
-        /*
-        const outliner = components.get(OBCF.Outliner);
-        outliner.world = world;
-        outliner.enabled = true;
-
-        outliner.create(
-        "example",
-        new THREE.MeshBasicMaterial({
-            color: 0xbcf124,
-            transparent: true,
-            opacity: 0.5,
-        }),
-        );
-
-        highlighter.events.select.onHighlight.add((data) => {
-            outliner.clear("example");
-            outliner.add("example", data);
-        });
-        highlighter.events.select.onClear.add(() => {
-            outliner.clear("example");
-        });
-        */
-        /*
-        viewerContainer.addEventListener("dblclick", async (event) => {
-            event.preventDefault();
-        
-            const newSelection = await highlighter.highlight("selectEventName", true, true);
-            if (newSelection) {
-                console.log("Fragmento resaltado:", newSelection);
-            } else {
-                console.log("No se resaltó ningún fragmento.");
-            }
-        });
-        */
     }
     const onToggleVisibility = () => {
         const highlighter = components.get(OBCF.Highlighter)
         const fragments = components.get(OBC.FragmentsManager)
-        const selection = highlighter.selection.select
+        const selection = highlighter.selection.selectEvent // It must be the same than "selectName" in the setup.
         if (!selection) {
             console.log("La selección no está definida")
             return
@@ -131,8 +96,11 @@ export function IFCViewer(){
     const onIsolate = () => {
         const highlighter = components.get(OBCF.Highlighter)
         const hider = components.get(OBC.Hider)
-        const selection = highlighter.selection.select
-        if(!selection)return
+        const selection = highlighter.selection.selectEvent
+        if(!selection){
+            console.log("No hay selección")
+            return
+        }
         hider.isolate(selection)
     }
     const onShow = () => {
@@ -142,7 +110,7 @@ export function IFCViewer(){
     const onShowProperties = async () =>{
         if(!fragmentModel){return}
         const highlighter = components.get(OBCF.Highlighter)
-        const selection = highlighter.selection.select
+        const selection = highlighter.selection.selectEvent
         const indexer  =components.get(OBC.IfcRelationsIndexer)
         if(Object.keys(selection).length === 0) return
         for (const fragmentID in selection){
@@ -171,10 +139,85 @@ export function IFCViewer(){
             </bim-grid>
             `
         })
+
+        const elementPropertyPanel = BUI.Component.create<BUI.Panel>(()=>{
+            const [propsTable, updatePropsTable] = CUI.tables.elementProperties({
+                components,
+                fragmentIdMap: {}
+            })
+            
+            const highlighter = components.get(OBCF.Highlighter)
+            console.log('highlighter.events:', highlighter.events);
+            highlighter.events.selectEvent.onHighlight.add((fragmentIdMap) => { 
+                if(!floatingGrid) return
+                floatingGrid.layout="secondary"
+                updatePropsTable({fragmentIdMap})
+                propsTable.expanded = false
+            })
+            highlighter.events.selectEvent.onClear.add(() => {
+                updatePropsTable({fragmentIdMap: {} })
+                if(!floatingGrid) return
+                floatingGrid.layout="main"
+            })
+
+            const search = (e: Event) => {
+                const input = e.target as BUI.TextInput
+                propsTable.queryString = input.value
+            }
+
+            return BUI.html`
+            <bim-panel>
+                <bim-panel-section
+                    name="Información"
+                    label="Propiedades"
+                    icon="solar:document-bold"
+                    fixed
+                >
+                    <bim-text-input @input=${search} placeholder="Buscar..."></bim-text-input>
+                    ${propsTable}
+                </bim-panel-section>
+            </bim-panel>
+            `
+        })
+
+        const onWorldsUpdate = () => {
+            if (!floatingGrid) return
+            floatingGrid.layout = "world"
+        }
+        const worldPanel = BUI.Component.create<BUI.Panel>(() => {
+            const [worldsTable] = CUI.tables.worldsConfiguration({ components })
+            
+            const search = (e: Event) => {
+                const input = e.target as BUI.TextInput
+                worldsTable.queryString = input.value
+            }
+            
+            return BUI.html `
+                <bim-panel>
+                <bim-panel-section
+                    name="world"
+                    label="Worlds"
+                    icon="tabler:brush"
+                    fixed
+                >
+                    <bim-text-input @input=${search} placeholder="Buscar..."></bim-text-input>
+                    ${worldsTable}  
+                </bim-panel-section>
+                </bim-panel>
+            `;
+        })
+
         const toolbar = BUI.Component.create<BUI.Toolbar>(() =>{
             const [loadIfcBtn] = CUI.buttons.loadIfc({ components: components })
             return BUI.html`
                 <bim-toolbar style="justify-self: center">
+                    <bim-toolbar-section label="App">
+                        <bim-button 
+                        label="World" 
+                        icon="tabler:brush" 
+                        @click=${onWorldsUpdate}
+                        ></bim-button>
+                    </bim-toolbar-section>
                     <bim-toolbar-section label="IFC">
                         ${loadIfcBtn}
                     </bim-toolbar-section>
@@ -215,6 +258,28 @@ export function IFCViewer(){
                 `,
                 elements: {
                     toolbar
+                }
+            },
+            secondary: {
+                template: `
+                    "empty elementPropertyPanel" 1fr
+                    "toolbar toolbar" auto
+                    / 1fr 20rem
+                `,
+                elements: {
+                    toolbar,
+                    elementPropertyPanel
+                }
+            },
+            world: {
+                template: `
+                    "empty worldPanel" 1fr
+                    "toolbar toolbar" auto
+                    / 1fr 20rem
+                `,
+                elements: {
+                    toolbar,
+                    worldPanel
                 }
             }
         }
