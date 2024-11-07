@@ -340,19 +340,19 @@ export class ProjectsManager {
             projectDetails.querySelector('[data-project-info="description"]')!.textContent = project.description;
             projectDetails.querySelector('[data-project-info="type"]')!.textContent = project.type;
             projectDetails.querySelector('[data-project-info="status"]')!.textContent = project.status;
-            //projectDetails.querySelector('[data-project-info="budget"]')!.textContent = `${project.budget}`;
-            //projectDetails.querySelector('[data-project-info="date"]')!.textContent  = formattedDate;
-            /*
+            projectDetails.querySelector('[data-project-info="budget"]')!.textContent = `${project.budget} €`;
+            projectDetails.querySelector('[data-project-info="date"]')!.textContent  = project.date;
+            
             //Asegurarmen que existe el elemento de progreso:
             const progressElement = projectDetails.querySelector('[data-project-info="progress"]');
             if (progressElement) {
-                (progressElement as HTMLElement).textContent = `${project.progress}`;
-                (progressElement as HTMLElement).style.width = `${project.progress}`;
+                (progressElement as HTMLElement).textContent = `${project.progress} %`;
+                (progressElement as HTMLElement).style.width = `${project.progress}%`;
             } else {
                 console.error('Elemento de progreso no encontrado');
                 this.showErrorDialog('Elemento de progreso no encontrado.');
             }
-            */
+            
         }
     }
 
