@@ -276,6 +276,7 @@ export class ProjectsManager {
                         existingProject.date = project.date || existingProject.date;
                         existingProject.budget = project.budget || existingProject.budget;
                         existingProject.progress = project.progress || existingProject.progress;
+                        this.updateProjectDetails(existingProject)
 
                         const projectDetail = document.querySelector('#project-details');
                         if (projectDetail) {
@@ -327,7 +328,35 @@ export class ProjectsManager {
         input.addEventListener('change', cargaJson);
         input.click()
     }
+    // Update ProjectDetails:
+    updateProjectDetails(project: Project) {
+        const dateFunctions = new DateFunctions();
+        //const formattedDate = dateFunctions.formatDate(project.date)
+        
+        const projectDetails = document.getElementById('project-details');
+        if (projectDetails) {
+            projectDetails.querySelector('[data-project-info="name"]')!.textContent  = project.name;
+            projectDetails.querySelector('[data-project-info="code"]')!.textContent = project.code;
+            projectDetails.querySelector('[data-project-info="description"]')!.textContent = project.description;
+            projectDetails.querySelector('[data-project-info="type"]')!.textContent = project.type;
+            projectDetails.querySelector('[data-project-info="status"]')!.textContent = project.status;
+            //projectDetails.querySelector('[data-project-info="budget"]')!.textContent = `${project.budget}`;
+            //projectDetails.querySelector('[data-project-info="date"]')!.textContent  = formattedDate;
+            /*
+            //Asegurarmen que existe el elemento de progreso:
+            const progressElement = projectDetails.querySelector('[data-project-info="progress"]');
+            if (progressElement) {
+                (progressElement as HTMLElement).textContent = `${project.progress}`;
+                (progressElement as HTMLElement).style.width = `${project.progress}`;
+            } else {
+                console.error('Elemento de progreso no encontrado');
+                this.showErrorDialog('Elemento de progreso no encontrado.');
+            }
+            */
+        }
+    }
 
+    
     // Editar el proyecto:
 
     getCurrentProject(): Project | null {
