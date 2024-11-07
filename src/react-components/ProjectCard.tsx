@@ -8,7 +8,7 @@ interface Props {
 
 export function ProjectCard(props: Props){
 
-    const iconLetters = (props.project.name).slice(0, 2).toUpperCase();
+    const iconLetters = props.project.name.split(' ').slice(0, 2).map(word => word[0].toUpperCase()).join('');
     const colors = ['#0000FF', '#000FFF', '#00FF00', '#FFFF00', '#FFA500', '#FF0000'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
 

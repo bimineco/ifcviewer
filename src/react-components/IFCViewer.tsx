@@ -6,6 +6,7 @@ import * as BUI from '@thatopen/ui'
 import * as CUI from '@thatopen/ui-obc'
 import * as THREE from 'three'
 import { FragmentsManager } from '@thatopen/components'
+import {FragmentsGroup} from '@thatopen/fragments'
 
 export function IFCViewer(){
     const components = new OBC.Components();
