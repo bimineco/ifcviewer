@@ -42,7 +42,14 @@ export function UserPage(){
                         Task: "N/A",
                         Role: "Gerente"
                     }
-                }                
+                },
+                {
+                    data: {
+                        Name: "Rodrigo Salas",
+                        Task: "Blender",
+                        Role: "N/A"
+                    }
+                }                  
             ]
         }
 
