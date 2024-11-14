@@ -6,12 +6,15 @@ import * as BUI from '@thatopen/ui'
 import * as CUI from '@thatopen/ui-obc'
 import * as THREE from 'three'
 import { FragmentsManager } from '@thatopen/components'
-import {FragmentsGroup} from '@thatopen/fragments'
+import {FragmentsGroup, IfcProperties} from '@thatopen/fragments'
 
 export function IFCViewer(){
     const components = new OBC.Components();
     let fragmentModel: FragmentsGroup | undefined
-
+    const [classificationsTree, updateClassificationsTree] = CUI.tables.classificationTree({
+        components,
+        classifications: []
+    })
     const setViewer = () =>{
         
         const worlds = components.get(OBC.Worlds)
@@ -42,16 +45,30 @@ export function IFCViewer(){
 
         const ifcLoader = components.get(OBC.IfcLoader)
         ifcLoader.setup()
+
+        const cullers = components.get(OBC.Cullers)
+        const culler = cullers.create(world)
         
         const fragmentsManager = components.get(OBC.FragmentsManager)
         fragmentsManager.onFragmentsLoaded.add(async(model) => {
             world.scene.three.add(model)
 
-            const indexer = components.get(OBC.IfcRelationsIndexer)
-            await indexer.process(model)
+            model.getLocalProperties()
+            if (model.hasProperties){
+                await processModel(model)
+            }
+            
+            for (const fragment of model.items) {
+                culler.add(fragment.mesh)
+            }
+            culler.needsUpdate = true
+
             fragmentModel = model
 
             })
+
+
+
         const highlighter = components.get(OBCF.Highlighter)
         highlighter.setup({ 
         selectName: "selectEvent", // Cuidado que al cambiar esto ya no vale lo que explica JH.
@@ -70,7 +87,106 @@ export function IFCViewer(){
             rendererComponent.resize()
             cameraComponent.updateAspect()
         })
+        world.camera.controls.addEventListener("controlend", () =>{
+            culler.needsUpdate = true
+        })
     }
+    const processModel = async (model: FragmentsGroup) => {
+        if (!model.hasProperties) return
+        const indexer = components.get(OBC.IfcRelationsIndexer)
+        await indexer.process(model)
+    
+        const classifier = components.get(OBC.Classifier)
+        await classifier.bySpatialStructure(model)
+        classifier.byEntity(model)
+    
+        const classifications = [
+            {
+                system: "entities", label: "Entities"
+            },
+            {
+                system: "spatialStructures", label: "Spatial Containers"
+            }
+            ]
+            if (updateClassificationsTree) {
+            updateClassificationsTree({classifications})
+        }
+    }
+        
+    const onPopertyExport = async () => {
+        if (!fragmentModel) return
+        const exported = fragmentModel.getLocalProperties()
+        const serialized = JSON.stringify(exported);
+        const file = new File([new Blob([serialized])], "properties.json");
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.download = "properties.json";
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        link.remove();
+    }
+    const onPropertyImport = async () => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = 'application/json'
+        const reader = new FileReader()
+        reader.addEventListener("load", async () => {
+            const json = reader.result
+            if (!json) { return }
+            const properties = JSON.parse(json as string)
+            if (!fragmentModel) return
+            fragmentModel.setLocalProperties(properties)
+            await processModel(fragmentModel)
+        })
+        input.addEventListener('change', () => {
+            const filesList = input.files
+            if (!filesList) { return }
+            reader.readAsText(filesList[0])
+            })
+        input.click()
+    }
+
+    const onFragmentExport = () =>{
+        const fragmentsManager = components.get(OBC.FragmentsManager)
+        if (!fragmentModel) return
+        const fragmentBinary = fragmentsManager.export(fragmentModel)
+        const blob = new Blob([fragmentBinary])
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${fragmentModel.name}.frag`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+    const onFragmentImport = async () => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = '.frag'
+        const reader = new FileReader()
+        reader.addEventListener("load", () => {
+            const binary = reader.result
+            if(!(binary instanceof ArrayBuffer)) return
+            const fragmentBinary = new Uint8Array(binary)
+            const fragmentsManager = components.get(OBC.FragmentsManager)
+            fragmentsManager.load(fragmentBinary)
+        })
+        input.addEventListener('change', () => {
+            const filesList = input.files
+            if (!filesList) { return }
+            reader.readAsArrayBuffer(filesList[0])
+        })
+        input.click()
+    }
+
+    const onFragmentDispose = () => {
+        const fragmentsManager = components.get(OBC.FragmentsManager)
+        for (const [, group] of fragmentsManager.groups) {
+            fragmentsManager.disposeGroup(group)
+        }
+        fragmentModel = undefined
+    }
+
     const onToggleVisibility = () => {
         const highlighter = components.get(OBCF.Highlighter)
         const fragments = components.get(OBC.FragmentsManager)
@@ -180,6 +296,30 @@ export function IFCViewer(){
             </bim-panel>
             `
         })
+        const onClassifier = () => {
+            if (!floatingGrid) return
+            if (floatingGrid.layout !== "classifier") {
+                floatingGrid.layout = "classifier"
+            } else {
+                floatingGrid.layout = "main"
+            }
+        }
+        
+        const classifierPanel = BUI.Component.create<BUI.Panel>(() => {
+        return BUI.html`
+            <bim-panel>
+            <bim-panel-section 
+                name="classifier" 
+                label="Classifier" 
+                icon="solar:document-bold" 
+                fixed
+            >
+                <bim-label>Classifications</bim-label>
+                ${classificationsTree}
+            </bim-panel-section>
+            </bim-panel>
+        `;
+        })
 
         const onWorldsUpdate = () => {
             if (!floatingGrid) return
@@ -210,11 +350,13 @@ export function IFCViewer(){
 
         const toolbar = BUI.Component.create<BUI.Toolbar>(() =>{
             const [loadIfcBtn] = CUI.buttons.loadIfc({ components: components })
+            loadIfcBtn.tooltipTitle = "Load IFC"
+            loadIfcBtn.label = ""
             return BUI.html`
                 <bim-toolbar style="justify-self: center">
                     <bim-toolbar-section label="App">
                         <bim-button 
-                        label="World" 
+                        tooltip-title="World" 
                         icon="tabler:brush" 
                         @click=${onWorldsUpdate}
                         ></bim-button>
@@ -222,30 +364,64 @@ export function IFCViewer(){
                     <bim-toolbar-section label="IFC">
                         ${loadIfcBtn}
                     </bim-toolbar-section>
+                    <bim-toolbar-section label="Procesado 3D">
+                        <bim-button 
+                            tooltip-title="Importar"
+                            icon="mdi:cube"
+                            @click=${onFragmentImport}
+                        ></bim-button>
+                        <bim-button
+                            tooltip-title="Exportar"
+                            icon="tabler:package-export"
+                            @click=${onFragmentExport}
+                        ></bim-button>
+                        <bim-button
+                            tooltip-title="Borrar"
+                            icon="tabler:trash"
+                            @click=${onFragmentDispose}
+                        ></bim-button>
+                    </bim-toolbar-section>
                     <bim-toolbar-section label="Seleccionar">
                         <bim-button 
-                            label="Visibilidad"
+                            tooltip-title="Visibilidad"
                             icon="material-symbols:visibility-outline"
                             @click=${onToggleVisibility}
                         ></bim-button>
                         <bim-button 
-                            label="Aislar"
+                            tooltip-title="Aislar"
                             icon="mdi:filter"
                             @click=${onIsolate}
                         ></bim-button>
                         <bim-button 
-                            label="Mostrar Todo"
+                            tooltip-title="Mostrar Todo"
                             icon="tabler:eye-filled"
                             @click=${onShow}
                         ></bim-button>
                     </bim-toolbar-section>
                     <bim-toolbar-section label="Propiedades">
                         <bim-button 
-                            label="Mostrar"
+                            tooltip-title="Mostrar"
                             icon="clarity:list-line"
                             @click=${onShowProperties}
                         ></bim-button>
+                        <bim-button
+                            tooltip-title="Importar"
+                            icon="clarity:import-line"
+                            @click=${onPropertyImport}
+                        ></bim-button>
+                        <bim-button
+                            tooltip-title="Exportar"
+                            icon="clarity:export-line"
+                            @click=${onPopertyExport}
+                        ></bim-button>
                     </bim-toolbar-section>
+                    <bim-toolbar-section label="Grupos">
+                    <bim-button 
+                        tooltip-title="Mostrar"
+                        icon="tabler:eye-filled"
+                        @click=${onClassifier}
+                    ></bim-button>
+                </bim-toolbar-section>
                 </bim-toolbar>
             `
         })
@@ -282,6 +458,17 @@ export function IFCViewer(){
                     toolbar,
                     worldPanel
                 }
+            },
+            classifier: {
+                template: `
+                    "empty classifierPanel" 1fr
+                    "toolbar toolbar" auto
+                    /1fr 20rem
+                `,
+                elements: { 
+                    toolbar,
+                    classifierPanel
+                },
             }
         }
         floatingGrid.layout = "main"
@@ -289,9 +476,11 @@ export function IFCViewer(){
     }
     
     React.useEffect(()=>{
+        setTimeout(()=>{
+            setViewer()
+            setupUI()
+        })
         
-        setViewer()
-        setupUI()
         return () =>{
             if(components){
                 components.dispose()
