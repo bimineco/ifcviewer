@@ -1,7 +1,16 @@
 import * as React from 'react'
 import * as Router from 'react-router-dom'
-
+import {
+    signOut
+} from "firebase/auth";
+import { auth } from "../firebase";
 export function Sidebar(){
+    const handleLogout = () => {
+        
+        auth.signOut().then(() => {
+            console.log('Sesión cerrada');
+        });
+    }
     return (
         <aside id="sidebar">
             <img id="company-logo" src="./src/Logo_blanco.jpg" alt="Logo"/>
@@ -21,6 +30,24 @@ export function Sidebar(){
                     Visor IFC
                 </Router.Link>
             </ul>
+            <div style={{ 
+                position: 'absolute',
+                bottom: 0,
+                left: 200,
+                padding: '10px'
+            }}>
+                <button style={{
+                    fontSize: '12px',
+                    padding: '5px 10px',
+                    borderRadius: '5px',
+                    backgroundColor: 'var(--complementary-light)',
+                    border: 'none',
+                    cursor: 'pointer'
+                }} onClick={handleLogout}>
+                    <span className="material-symbols-outlined">logout</span>
+                    Cerrar sesión
+                </button>
+            </div>
         </aside>
     )
 }

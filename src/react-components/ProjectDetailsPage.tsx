@@ -7,8 +7,12 @@ import { DateFunctions } from '../classes/DateFunctions';
 import { ToDoCard } from './ToDoCard'
 import { IFCViewer } from './IFCViewer';
 import { deleteDocument, updateDocument } from '../firebase'
+import * as OBC from '@thatopen/components'
+
+
 interface Props {
     projectsManager: ProjectsManager
+    components: OBC.Components
 }
 export function ProjectDetailsPage(props: Props){
     const toDoManager = new ToDoManager()
@@ -283,9 +287,9 @@ export function ProjectDetailsPage(props: Props){
                         </div>
                     </div>
                     </div>
-                < ToDoCard toDoManager={toDoManager} />
+                < ToDoCard toDoManager={toDoManager} components={props.components}/>
                 </div>
-                < IFCViewer />
+                < IFCViewer components={props.components} />
             </div>
         </div>
     )

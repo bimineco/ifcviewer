@@ -4,9 +4,12 @@ import * as Router from 'react-router-dom'
 import { ToDoItem } from './ToDoItem';
 import { IToDo, ToDo, ToDoStatus, ToDoPriority } from '../classes/ToDo';
 import { Modals } from '../classes/Modals';
+import * as OBC from '@thatopen/components'
+import { todoTool } from "../bim-components/TodoCreator/";
 
 interface Props {
     toDoManager: ToDoManager;
+    components: OBC.Components;
 }
 
 export function ToDoCard(props: Props){
@@ -50,6 +53,11 @@ export function ToDoCard(props: Props){
             alert(err);
         }
     }
+    const todoContainer = React.useRef<HTMLDivElement>(null)
+    React.useEffect(() => {
+        const todoButton = todoTool({ components: props.components });
+        todoContainer.current?.appendChild(todoButton)
+    }, []);
 
     return(
         <>
@@ -180,6 +188,7 @@ export function ToDoCard(props: Props){
                         columnGap: 10,
                         justifyItems: "end"
                     }}
+                        ref={todoContainer}
                     >
                         <div
                             style={{

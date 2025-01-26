@@ -8,15 +8,22 @@ import * as THREE from 'three'
 import { FragmentsManager } from '@thatopen/components'
 import {FragmentsGroup, IfcProperties} from '@thatopen/fragments'
 
-export function IFCViewer(){
-    const components = new OBC.Components();
+interface Props{
+    components: OBC.Components
+}
+
+export function IFCViewer(props: Props){
     let fragmentModel: FragmentsGroup | undefined
+    const components : OBC.Components = props.components
+    
     const [classificationsTree, updateClassificationsTree] = CUI.tables.classificationTree({
         components,
         classifications: []
     })
+
+    let highlighter
     const setViewer = () =>{
-        
+    
         const worlds = components.get(OBC.Worlds)
 
         const world = worlds.create<
@@ -38,7 +45,7 @@ export function IFCViewer(){
         world.camera = cameraComponent
         
         components.init()
-        
+                    
         world.renderer.postproduction.enabled = true
         world.camera.controls.setLookAt(3,3,3,0,0,0)
         world.camera.updateAspect()
@@ -65,9 +72,7 @@ export function IFCViewer(){
 
             fragmentModel = model
 
-            })
-
-
+        })
 
         const highlighter = components.get(OBCF.Highlighter)
         highlighter.setup({ 
@@ -91,158 +96,6 @@ export function IFCViewer(){
             culler.needsUpdate = true
         })
     }
-    const processModel = async (model: FragmentsGroup) => {
-        if (!model.hasProperties) return
-        const indexer = components.get(OBC.IfcRelationsIndexer)
-        await indexer.process(model)
-    
-        const classifier = components.get(OBC.Classifier)
-        await classifier.bySpatialStructure(model)
-        classifier.byEntity(model)
-    
-        const classifications = [
-            {
-                system: "entities", label: "Entities"
-            },
-            {
-                system: "spatialStructures", label: "Spatial Containers"
-            }
-            ]
-            if (updateClassificationsTree) {
-            updateClassificationsTree({classifications})
-        }
-    }
-        
-    const onPopertyExport = async () => {
-        if (!fragmentModel) return
-        const exported = fragmentModel.getLocalProperties()
-        const serialized = JSON.stringify(exported);
-        const file = new File([new Blob([serialized])], "properties.json");
-        const url = URL.createObjectURL(file);
-        const link = document.createElement("a");
-        link.download = "properties.json";
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-        link.remove();
-    }
-    const onPropertyImport = async () => {
-        const input = document.createElement('input')
-        input.type = 'file'
-        input.accept = 'application/json'
-        const reader = new FileReader()
-        reader.addEventListener("load", async () => {
-            const json = reader.result
-            if (!json) { return }
-            const properties = JSON.parse(json as string)
-            if (!fragmentModel) return
-            fragmentModel.setLocalProperties(properties)
-            await processModel(fragmentModel)
-        })
-        input.addEventListener('change', () => {
-            const filesList = input.files
-            if (!filesList) { return }
-            reader.readAsText(filesList[0])
-            })
-        input.click()
-    }
-
-    const onFragmentExport = () =>{
-        const fragmentsManager = components.get(OBC.FragmentsManager)
-        if (!fragmentModel) return
-        const fragmentBinary = fragmentsManager.export(fragmentModel)
-        const blob = new Blob([fragmentBinary])
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${fragmentModel.name}.frag`
-        a.click()
-        URL.revokeObjectURL(url)
-    }
-    const onFragmentImport = async () => {
-        const input = document.createElement('input')
-        input.type = 'file'
-        input.accept = '.frag'
-        const reader = new FileReader()
-        reader.addEventListener("load", () => {
-            const binary = reader.result
-            if(!(binary instanceof ArrayBuffer)) return
-            const fragmentBinary = new Uint8Array(binary)
-            const fragmentsManager = components.get(OBC.FragmentsManager)
-            fragmentsManager.load(fragmentBinary)
-        })
-        input.addEventListener('change', () => {
-            const filesList = input.files
-            if (!filesList) { return }
-            reader.readAsArrayBuffer(filesList[0])
-        })
-        input.click()
-    }
-
-    const onFragmentDispose = () => {
-        const fragmentsManager = components.get(OBC.FragmentsManager)
-        for (const [, group] of fragmentsManager.groups) {
-            fragmentsManager.disposeGroup(group)
-        }
-        fragmentModel = undefined
-    }
-
-    const onToggleVisibility = () => {
-        const highlighter = components.get(OBCF.Highlighter)
-        const fragments = components.get(OBC.FragmentsManager)
-        const selection = highlighter.selection.selectEvent // It must be the same than "selectName" in the setup.
-        if (!selection) {
-            console.log("La selección no está definida")
-            return
-        }
-        if(Object.keys(selection).length === 0) return
-        for (const fragmentID in selection){
-            const fragment = fragments.list.get(fragmentID)
-            const expressIDs = selection[fragmentID]
-            for (const id of expressIDs){
-                if (!fragment) continue
-                const isHidden = fragment.hiddenItems.has(id)
-                if (isHidden){
-                    fragment.setVisibility(true,[id])
-                } else {
-                    fragment.setVisibility(false,[id])
-                }
-            }
-        }
-    }
-    const onIsolate = () => {
-        const highlighter = components.get(OBCF.Highlighter)
-        const hider = components.get(OBC.Hider)
-        const selection = highlighter.selection.selectEvent
-        if(!selection){
-            console.log("No hay selección")
-            return
-        }
-        hider.isolate(selection)
-    }
-    const onShow = () => {
-        const hider = components.get(OBC.Hider)
-        hider.set(true)
-    }
-    const onShowProperties = async () =>{
-        if(!fragmentModel){return}
-        const highlighter = components.get(OBCF.Highlighter)
-        const selection = highlighter.selection.selectEvent
-        const indexer  =components.get(OBC.IfcRelationsIndexer)
-        if(Object.keys(selection).length === 0) return
-        for (const fragmentID in selection){
-            const expressIDs = selection[fragmentID]
-            for (const id of expressIDs){
-                const psets = indexer.getEntityRelations(fragmentModel, id, "ContainedInStructure")
-                if (psets){
-                    for (const expressId of psets){
-                        const prop = await fragmentModel.getProperties(expressId)
-                        console.log(prop)
-                    }
-                }
-            }
-        }
-    }
     const setupUI = () => {
         const viewerContainer = document.getElementById("viewer-container") as HTMLElement
         if(!viewerContainer) return
@@ -264,7 +117,6 @@ export function IFCViewer(){
             })
             
             const highlighter = components.get(OBCF.Highlighter)
-            console.log('highlighter.events:', highlighter.events);
             highlighter.events.selectEvent.onHighlight.add((fragmentIdMap) => { 
                 if(!floatingGrid) return
                 floatingGrid.layout="secondary"
@@ -276,7 +128,7 @@ export function IFCViewer(){
                 if(!floatingGrid) return
                 floatingGrid.layout="main"
             })
-
+        
             const search = (e: Event) => {
                 const input = e.target as BUI.TextInput
                 propsTable.queryString = input.value
@@ -474,29 +326,185 @@ export function IFCViewer(){
         floatingGrid.layout = "main"
         viewerContainer.appendChild(floatingGrid)
     }
+    const processModel = async (model: FragmentsGroup) => {
+        if (!model.hasProperties) return
+        const indexer = components.get(OBC.IfcRelationsIndexer)
+        await indexer.process(model)
     
-    React.useEffect(()=>{
-        setTimeout(()=>{
-            setViewer()
-            setupUI()
-        })
+        const classifier = components.get(OBC.Classifier)
+        await classifier.bySpatialStructure(model)
+        classifier.byEntity(model)
+    
+        const classifications = [
+            {
+                system: "entities", label: "Entities"
+            },
+            {
+                system: "spatialStructures", label: "Spatial Containers"
+            }
+            ]
+            if (updateClassificationsTree) {
+            updateClassificationsTree({classifications})
+        }
+    }
         
-        return () =>{
-            if(components){
-                components.dispose()
-            }
-            if (fragmentModel){
-                fragmentModel.dispose()
-                fragmentModel = undefined
-            }
-            const viewerContainer = document.getElementById("viewer-container")
-            if (viewerContainer) {
-                viewerContainer.innerHTML = ""
-            }
-        };
+    const onPopertyExport = async () => {
+        if (!fragmentModel) return
+        const exported = fragmentModel.getLocalProperties()
+        const serialized = JSON.stringify(exported);
+        const file = new File([new Blob([serialized])], "properties.json");
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.download = "properties.json";
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        link.remove();
+    }
+    const onPropertyImport = async () => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = 'application/json'
+        const reader = new FileReader()
+        reader.addEventListener("load", async () => {
+            const json = reader.result
+            if (!json) { return }
+            const properties = JSON.parse(json as string)
+            if (!fragmentModel) return
+            fragmentModel.setLocalProperties(properties)
+            await processModel(fragmentModel)
+        })
+        input.addEventListener('change', () => {
+            const filesList = input.files
+            if (!filesList) { return }
+            reader.readAsText(filesList[0])
+            })
+        input.click()
+    }
 
-    },[]);
+    const onFragmentExport = () =>{
+        const fragmentsManager = components.get(OBC.FragmentsManager)
+        if (!fragmentModel) return
+        const fragmentBinary = fragmentsManager.export(fragmentModel)
+        const blob = new Blob([fragmentBinary])
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${fragmentModel.name}.frag`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+    const onFragmentImport = async () => {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = '.frag'
+        const reader = new FileReader()
+        reader.addEventListener("load", () => {
+            const binary = reader.result
+            if(!(binary instanceof ArrayBuffer)) return
+            const fragmentBinary = new Uint8Array(binary)
+            const fragmentsManager = components.get(OBC.FragmentsManager)
+            fragmentsManager.load(fragmentBinary)
+        })
+        input.addEventListener('change', () => {
+            const filesList = input.files
+            if (!filesList) { return }
+            reader.readAsArrayBuffer(filesList[0])
+        })
+        input.click()
+    }
+
+    const onFragmentDispose = () => {
+        const fragmentsManager = components.get(OBC.FragmentsManager)
+        for (const [, group] of fragmentsManager.groups) {
+            fragmentsManager.disposeGroup(group)
+        }
+        fragmentModel = undefined
+    }
+
+    const onToggleVisibility = () => {
+        const highlighter = components.get(OBCF.Highlighter)
+        const fragments = components.get(OBC.FragmentsManager)
+        const selection = highlighter.selection.selectEvent // It must be the same than "selectName" in the setup.
+        if (!selection) {
+            console.log("La selección no está definida")
+            return
+        }
+        if(Object.keys(selection).length === 0) return
+        for (const fragmentID in selection){
+            const fragment = fragments.list.get(fragmentID)
+            const expressIDs = selection[fragmentID]
+            for (const id of expressIDs){
+                if (!fragment) continue
+                const isHidden = fragment.hiddenItems.has(id)
+                if (isHidden){
+                    fragment.setVisibility(true,[id])
+                } else {
+                    fragment.setVisibility(false,[id])
+                }
+            }
+        }
+    }
+    const onIsolate = () => {
+        const highlighter = components.get(OBCF.Highlighter)
+        const hider = components.get(OBC.Hider)
+        const selection = highlighter.selection.selectEvent
+        if(!selection){
+            console.log("No hay selección")
+            return
+        }
+        hider.isolate(selection)
+    }
+    const onShow = () => {
+        const hider = components.get(OBC.Hider)
+        hider.set(true)
+    }
+    const onShowProperties = async () =>{
+        if(!fragmentModel){return}
+        const highlighter = components.get(OBCF.Highlighter)
+        const selection = highlighter.selection.selectEvent
+        const indexer  =components.get(OBC.IfcRelationsIndexer)
+        if(Object.keys(selection).length === 0) return
+        for (const fragmentID in selection){
+            const expressIDs = selection[fragmentID]
+            for (const id of expressIDs){
+                const psets = indexer.getEntityRelations(fragmentModel, id, "ContainedInStructure")
+                if (psets){
+                    for (const expressId of psets){
+                        const prop = await fragmentModel.getProperties(expressId)
+                        console.log(prop)
+                    }
+                }
+            }
+        }
+    }
     
+        React.useEffect(() => {
+            setTimeout(() => {
+                setViewer()
+                setupUI()
+            })
+
+
+            return () =>{
+                const highlighter = components.get(OBCF.Highlighter)
+                if (highlighter && typeof highlighter.dispose === "function") {
+                highlighter.dispose()
+                }
+                if(components){
+                    components.dispose()
+                }
+                if (fragmentModel){
+                    fragmentModel.dispose()
+                    fragmentModel = undefined
+                }
+                const viewerContainer = document.getElementById("viewer-container")
+                if (viewerContainer) {
+                    viewerContainer.innerHTML = ""
+                }
+            };
+        },[]);
+
     return (
         <bim-viewport
         id="viewer-container"
