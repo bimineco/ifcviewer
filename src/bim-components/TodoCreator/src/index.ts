@@ -1,2 +1,2 @@
-export * from "./TodoCreatorComponent"
+export * from "./TodoCreator"
 export * from "./Template"

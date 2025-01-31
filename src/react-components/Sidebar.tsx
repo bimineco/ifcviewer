@@ -29,6 +29,11 @@ export function Sidebar(){
                     <span className="material-symbols-outlined">3d_rotation</span>
                     Visor IFC
                 </Router.Link>
+
+                <Router.Link to={`/toc`} className="button-main" id="toc-nav-btn">
+                <span className="material-symbols-outlined">labs</span>
+                    Pruebas TOC
+                </Router.Link>
             </ul>
             <div style={{ 
                 position: 'absolute',

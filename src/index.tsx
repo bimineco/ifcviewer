@@ -8,15 +8,15 @@ import { UserPage } from './react-components/UserPage';
 import { ProjectsManager} from "./classes/ProjectsManager"
 import * as BUI from "@thatopen/ui"
 import * as OBC from '@thatopen/components'
-import { ToDoManager } from "./classes/ToDoManager";
-import { IProject, ProjectStatus, ProjectType } from "./classes/Project"
-import { IToDo, ToDoStatus, ToDoPriority} from "./classes/ToDo";
+
 import { IFCViewer } from './react-components/IFCViewer';
+import { TOC } from './react-components/TOC';
+
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 import { Welcome } from './react-components/Welcome';
-import { AppManager } from './bim-components/AppManager';
+
 
 BUI.Manager.init()
 
@@ -30,7 +30,9 @@ declare global{
             "bim-viewport": any;
             "bim-panel": any;
             //"bim-panel-section": any;
-        
+            "bim-table": any;
+            "bim-dropdown": any;
+            "bim-option": any;
         }
     }
 }
@@ -53,6 +55,7 @@ onAuthStateChanged(auth, (user) => {
                     <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} components={components} />} />
                     <Router.Route path="/users" element={<UserPage />} />
                     <Router.Route path="/viewer" element={<IFCViewer components={components} />} />
+                    <Router.Route path="/toc" element={<TOC projectsManager={projectsManager} />} />
                 </Router.Routes>
             </Router.BrowserRouter>
         );

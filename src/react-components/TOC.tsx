@@ -1,119 +1,91 @@
-import * as React from 'react'
-import * as Router from 'react-router-dom'
-import { ProjectsManager } from '../classes/ProjectsManager';
-import { ToDoManager } from '../classes/ToDoManager';
-import { Project, IProject, ProjectType, ProjectStatus } from '../classes/Project';
-import { DateFunctions } from '../classes/DateFunctions';
-import { ToDoCard } from './ToDoCard'
-import { IFCViewer } from './IFCViewer';
-import { deleteDocument, updateDocument } from '../firebase'
-import * as OBC from '@thatopen/components'
-
-import { TodoCreator, TodoData, todoTool } from "../bim-components/TodoCreator/";
+import * as React from "react";
+import * as Router from "react-router-dom";
+import { ProjectsManager } from "../classes/ProjectsManager";
+import { IFCViewer } from "./IFCViewer";
+import { deleteDocument } from "../firebase";
 import * as BUI from "@thatopen/ui";
+import * as OBC from "@thatopen/components";
+import * as OBCF from "@thatopen/components-front";
+import { TodoCreator, todoTool } from "../bim-components/TodoCreator/";
+import { ref } from "firebase/database";
+import { TodoData } from "../bim-components/TodoCreator/src/base-types";
 
 interface Props {
     projectsManager: ProjectsManager
-    components: OBC.Components
 }
-export function ProjectDetailsPage(props: Props){
-    const toDoManager = new ToDoManager()
-    const actualizarRef = React.useRef<Project | null>(null);
-    const routeParams = Router.useParams<{id:string}>()
-    
-    if(!routeParams.id){
-        alert("No se ha encontrado el ID en la Base de Datos")
-        return (<p>No se ha encontrado el ID en la Base de Datos.</p>)
-    }
-    const project = props.projectsManager.getProject(routeParams.id)
-    if(!(project && project instanceof Project)){
-        alert ("El elemento no es un Proyecto válido para transformar.")
-        return (<p>El proyecto con ID {routeParams.id} no se ha podido mostrar.</p>)
-    }
 
-    const navigateTo = Router.useNavigate()
-    props.projectsManager.onProjectDeleted = async (id) => {
-        await deleteDocument('/projects', id)
-        navigateTo('/')
-    }
+export function TOC(props: Props) {
+    // Forzado para encontrar un proyecto en la base de datos
+    const projects = props.projectsManager.list
+    const project = projects.find(project => project.name === 'Default');
+    if (!project) {return (<p>The project with ID {project} wasn't found.</p>)}
+    console.log(project)
 
-    // Aseguramre que la fecha está modificada.
-    const dateFunctions = new DateFunctions();
-    const formattedDate = new Date(dateFunctions.formatDateToInput(project.date));
-
-    const onEditClick = () => {
-        props.projectsManager.EditProjectModal(project, (updatedProject: Project) => {
-            actualizarRef.current = updatedProject;
-        });
-    };
-    const onFormEditProject= async (event: React.FormEvent) => {
-        if (!actualizarRef.current){return}
-        try{
-            props.projectsManager.saveProjectChanges(actualizarRef.current);
-            await updateDocument<Partial<IProject>>("/projects",project.id,actualizarRef.current)
-            const modal = document.getElementById("edit-project-details");
-            if(modal && modal instanceof HTMLDialogElement){
-                modal.close();
-            }
-        } catch(err){
-            alert(err);
-        }
-    }
-
-    // Revisar BimTable:
     const components: OBC.Components = new OBC.Components()
     
+    const dashboard = React.useRef<HTMLDivElement>(null)
     const todoContainer = React.useRef<HTMLDivElement>(null)
-    console.log(todoContainer)
-    const tableRef = React.useRef<BUI.Table>(null)
-    console.log(tableRef)
-
+    
+    const navigateTo = Router.useNavigate()
+    
     const onRowCreated = (event) => {
         event.stopImmediatePropagation()
         const { row } = event.detail;
-        row.addEventListener("click", () => {
-            const fragments = components.get(OBC.FragmentsManager)
-            const guids = JSON.parse(row.data.Guids)
-            const fragmentIdMap = fragments.guidToFragmentIdMap(guids)
-            /*
-            const highlighter = components.get(OBCF.Highlighter)
-            highlighter.highlightByID("select", fragmentIdMap)
-            */
+        const originalColor = row.style.backgroundColor;
+        row.addEventListener("click", async() => {
+            todoCreator.highlightTodo({
+                name: row.data.Name,
+                task: row.data.Task,
+                priority: row.data.Priority,
+                ifcGuids: JSON.parse(row.data.Guids),
+                camera: JSON.parse(row.data.Camera)
             })
+        })
+        row.addEventListener("mouseover", () => { 
+            row.style.backgroundColor = "gray" 
+        })
+        row.addEventListener("mouseout", () => { 
+            row.style.backgroundColor = originalColor;
+        })
         }
+        
+
     const todoTable = BUI.Component.create<BUI.Table>(() => {
-    return BUI.html`
-        <bim-table @rowcreated=${onRowCreated}></bim-table>`
+        return BUI.html`
+            <bim-table @rowcreated=${onRowCreated}></bim-table>`
     })
+    
 
     const addTodo = (data: TodoData) => {
-        console.log(tableRef)
-        if (!tableRef.current) {return}
         console.log(data)
         const newData = {
         data: {
             Name: data.name,
             Task: data.task,
+            Priority: data.priority,
             Date: new Date().toDateString(),
+            Guids: JSON.stringify(data.ifcGuids),
+            Camera: data.camera ? JSON.stringify(data.camera) : ""
         },
         }
-        tableRef.current.data = [...tableRef.current.data, newData];
+        todoTable.data = [...todoTable.data, newData]
+        todoTable.hiddenColumns = ["Guids","Camera"];
     }
 
     const todoCreator = components.get(TodoCreator)
     todoCreator.onTodoCreated.add((data) => addTodo(data))
 
     React.useEffect(() => {
-        const todoButton = todoTool({ components })
-        console.log(todoButton)
+        dashboard.current?.appendChild(todoTable)
+        const [todoButton, todoPriorityButton] = todoTool({ components })
         todoContainer.current?.appendChild( todoButton )
+        todoContainer.current?.appendChild( todoPriorityButton )
     }, [])
-
-
-    return(
+    
+    return (
         <div className="page" id="project-details" data-project-id="">
             <dialog id="edit-project-details">
-                <form onSubmit={(e) =>{onFormEditProject(e)}} id="edit-project-form">
+                <form id="edit-project-form">
                     <h2 style={{ textAlign: "center" }}>Editar Proyecto</h2>
                     <div className="input-list">
                         <div className="form-field-container">
@@ -166,7 +138,7 @@ export function ProjectDetailsPage(props: Props){
                         </div>
                         <div className="form-field-container">
                             <label>Fecha de Finalización</label>
-                            <input name="date" type="date" defaultValue={formattedDate.toISOString().split('T')[0]} />
+                            <input name="date" type="date" defaultValue={'18/02/2025'} />
                         </div>
                         <div className="form-field-container">
                             <label>Progreso</label>
@@ -243,7 +215,7 @@ export function ProjectDetailsPage(props: Props){
                     <p data-project-info="description" style={{ color: "#212E3F", width: "75%", paddingLeft: "50px" }}>
                         {project.description}
                     </p>
-                    <button onClick={() => {props.projectsManager.deleteProject(project.id)}} style={{ paddingRight: "50px" }}>
+                    <button >
                         <span className="material-symbols-outlined">delete</span>Borrar
                     </button>
                 </div>
@@ -255,8 +227,7 @@ export function ProjectDetailsPage(props: Props){
                     display: "flex",
                     flexDirection: "column",
                     rowGap: 30
-                    }}
-                >
+                    }}>
                     <div className="dashboard-card" style={{ padding: "30px 5px" }}>
                         <div
                             className="card-header"
@@ -283,39 +254,40 @@ export function ProjectDetailsPage(props: Props){
                             >
                             {project.code}
                             </p>
-                            <button onClick={onEditClick} id="edit-project-btn" className="secondary-button">
+                            <button id="edit-project-btn" className="secondary-button">
                                 <p style={{ width: "100%" }}>Editar</p>
                             </button>
                         </div>
-                    <div className="card-content">
-                        <div className="card-property">
-                            <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
-                                Estado
-                            </p>
-                            <p data-project-info="status">{project.status}</p>
-                            </div>
+                        <div className="card-content">
                             <div className="card-property">
-                            <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
-                                Tipo
-                            </p>
-                            <p data-project-info="type">{project.type}</p>
+                                <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
+                                    Estado
+                                </p>
+                                <p data-project-info="status">{project.status}</p>
+                                </div>
+                                <div className="card-property">
+                                <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
+                                    Tipo
+                                </p>
+                                <p data-project-info="type">{project.type}</p>
+                                </div>
+                                <div className="card-property">
+                                <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
+                                    Presupuesto
+                                </p>
+                                <p data-project-info="budget">{project.budget}€</p>
+                                </div>
+                                <div className="card-property">
+                                <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
+                                    Fecha de Finalización
+                                </p>
+                                <p data-project-info="date">{project.date}</p>
+                                </div>
+                                <div className="card-property">
+                                <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
+                                    Progreso
+                                </p>
                             </div>
-                            <div className="card-property">
-                            <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
-                                Presupuesto
-                            </p>
-                            <p data-project-info="budget">{project.budget}€</p>
-                            </div>
-                            <div className="card-property">
-                            <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
-                                Fecha de Finalización
-                            </p>
-                            <p data-project-info="date">{project.date}</p>
-                            </div>
-                            <div className="card-property">
-                            <p style={{ color: "#969696", fontSize: "var(--font-xl)" }}>
-                                Progreso
-                            </p>
                         </div>
                         <div
                         style={{
@@ -323,8 +295,7 @@ export function ProjectDetailsPage(props: Props){
                             borderRadius: 999,
                             overflow: "auto",
                             width: "100%"
-                        }}
-                        >
+                        }}>
                             <div
                                 data-project-info="progress"
                                 style={{
@@ -338,17 +309,40 @@ export function ProjectDetailsPage(props: Props){
                             </div>
                         </div>
                     </div>
-                    
+                    <div className="dashboard-card" style={{ flexGrow: 1, padding:"5px" }} ref={dashboard}>
+                        <div
+                        style={{
+                            padding: "20px 30px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between"
+                        }}
+                        >
+                            <bim-label style={{fontSize: "var(--font-lg", color: "#fff"}}>To-Do</bim-label>
+                            <div
+                                style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "end",
+                                columnGap: 20
+                                }}
+                                ref={todoContainer}
+                            >
+                                <div
+                                style={{ display: "flex", alignItems: "center", columnGap: 10 }}
+                                >
+                                    <bim-label icon="material-symbols:search" style={{ color: "#fff" }}></bim-label>
+                                    <bim-text-input placeholder="Search To-Do's by name"></bim-text-input>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                < ToDoCard toDoManager={toDoManager} components={props.components}/>
+                </div>
+                <div style={{ flexBasis: "50%" }}>
+                    < IFCViewer components={components} />
                 </div>
                 
-                < IFCViewer components={props.components} />
             </div>
         </div>
-    )
-    
+)
 }
-
-
-        

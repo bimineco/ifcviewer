@@ -53,11 +53,13 @@ export function ToDoCard(props: Props){
             alert(err);
         }
     }
+    /*
     const todoContainer = React.useRef<HTMLDivElement>(null)
     React.useEffect(() => {
         const todoButton = todoTool({ components: props.components });
         todoContainer.current?.appendChild(todoButton)
     }, []);
+    */
 
     return(
         <>
@@ -188,7 +190,7 @@ export function ToDoCard(props: Props){
                         columnGap: 10,
                         justifyItems: "end"
                     }}
-                        ref={todoContainer}
+                        //ref={todoContainer}
                     >
                         <div
                             style={{

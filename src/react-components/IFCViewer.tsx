@@ -8,6 +8,9 @@ import * as THREE from 'three'
 import { FragmentsManager } from '@thatopen/components'
 import {FragmentsGroup, IfcProperties} from '@thatopen/fragments'
 
+//TODOCREATOR
+import { TodoCreator } from "../bim-components/TodoCreator";
+
 interface Props{
     components: OBC.Components
 }
@@ -95,6 +98,10 @@ export function IFCViewer(props: Props){
         world.camera.controls.addEventListener("controlend", () =>{
             culler.needsUpdate = true
         })
+        //TODOCREATOR
+        const todoCreator = components.get(TodoCreator)
+        todoCreator.world = world
+        todoCreator.setup()
     }
     const setupUI = () => {
         const viewerContainer = document.getElementById("viewer-container") as HTMLElement
