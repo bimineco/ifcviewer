@@ -12,4 +12,5 @@ export interface TodoData {
     priority: Priority
     ifcGuids: string[]
     camera: {position: THREE.Vector3, target: THREE.Vector3}
+    id: string
 }

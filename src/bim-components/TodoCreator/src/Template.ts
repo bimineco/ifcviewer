@@ -20,7 +20,7 @@ export const todoTool = (state: TodoUIState) => {
 
         const priorityInput = BUI.Component.create<BUI.Dropdown>(() => {
                 return BUI.html`
-                <bim-dropdown label="Priority">
+                <bim-dropdown label="Prioridad">
                         <bim-option Label="Baja" checked></bim-option>
                         <bim-option Label="Media"></bim-option>
                         <bim-option Label="Alta"></bim-option>
@@ -66,6 +66,12 @@ export const todoTool = (state: TodoUIState) => {
                 todoCreator.enablePriorityHighlight = btn.active
         }
 
+        const showMarkers = (event: Event) => {
+                const btn = event.target as BUI.Button
+                btn.active = !btn.active
+                todoCreator.enableMarkers = btn.active
+        }
+
         const todoPriorityButton = BUI.Component.create<BUI.Button>(() => {        
                 return BUI.html`
                 <bim-button
@@ -80,10 +86,28 @@ export const todoTool = (state: TodoUIState) => {
                 return BUI.html`
                 <bim-button
                 @click=${() => todoModal.showModal()}
-                icon="pajamas:todo-done"
-                tooltip-title="To-Do"
+                        icon="pajamas:todo-done"
+                        tooltip-title="Añadir nueva tarea"
                 ></bim-button>
                 `
         })
-        return [todoButton, todoPriorityButton]
+
+        const showMarkersButton = BUI.Component.create<BUI.Button>(() => {
+                return BUI.html`
+                <bim-button
+                        @click=${showMarkers}
+                        icon="pajamas:doc-symlink" 
+                        tooltip-title="Mostrar las tareas en el visor"
+                ></bim-button>
+                `
+        })
+        // https://icon-sets.iconify.design/pajamas/?icon-filter=all&keyword=pajama
+        todoCreator.onDisposed.add(()=>{
+                todoButton.remove()
+                todoPriorityButton.remove()
+                todoModal.remove()
+                showMarkersButton.remove()
+        })
+
+        return [todoButton, todoPriorityButton, showMarkersButton]
         }

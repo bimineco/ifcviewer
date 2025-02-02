@@ -19,7 +19,6 @@ export function TOC(props: Props) {
     const projects = props.projectsManager.list
     const project = projects.find(project => project.name === 'Default');
     if (!project) {return (<p>The project with ID {project} wasn't found.</p>)}
-    console.log(project)
 
     const components: OBC.Components = new OBC.Components()
     
@@ -38,7 +37,8 @@ export function TOC(props: Props) {
                 task: row.data.Task,
                 priority: row.data.Priority,
                 ifcGuids: JSON.parse(row.data.Guids),
-                camera: JSON.parse(row.data.Camera)
+                camera: JSON.parse(row.data.Camera),
+                id: row.data.id
             })
         })
         row.addEventListener("mouseover", () => { 
@@ -57,29 +57,64 @@ export function TOC(props: Props) {
     
 
     const addTodo = (data: TodoData) => {
-        console.log(data)
         const newData = {
         data: {
-            Name: data.name,
-            Task: data.task,
-            Priority: data.priority,
-            Date: new Date().toDateString(),
+            Nombre: data.name,
+            Tarea: data.task,
+            Prioridad: data.priority,
+            Fecha: new Date().toDateString(),
             Guids: JSON.stringify(data.ifcGuids),
-            Camera: data.camera ? JSON.stringify(data.camera) : ""
+            Camera: data.camera ? JSON.stringify(data.camera) : "",
+            Id: data.id,
+            Acciones: "",
+            
         },
         }
         todoTable.data = [...todoTable.data, newData]
-        todoTable.hiddenColumns = ["Guids","Camera"];
+        todoTable.dataTransform = {
+            Acciones: (_, rowData) => {
+                return BUI.html`
+                    <div style="display: flex; gap: 8px;">
+                        
+                        <bim-button 
+                            @click=${() => {
+                                const id = rowData.Id
+                                todoCreator.deleteTodo(id as string)
+                                todoTable.data = todoTable.data.filter(value => value.data.Id !== id)
+                            }}
+                            icon="material-symbols:delete" style="background-color: red"
+                        ></bim-button>
+                        <bim-button
+                            @click=${() => {
+                                const id = rowData.Id
+                                todoCreator.addTodoMaker(id as string, true)}}
+                            icon="ion:navigate"
+                        ></bim-button>
+                    </div>
+                `
+            }
+        }
+        todoTable.hiddenColumns = ["Guids","Camera", "Id"];
     }
 
     const todoCreator = components.get(TodoCreator)
     todoCreator.onTodoCreated.add((data) => addTodo(data))
+    
 
     React.useEffect(() => {
         dashboard.current?.appendChild(todoTable)
-        const [todoButton, todoPriorityButton] = todoTool({ components })
+        const [todoButton, todoPriorityButton, showMarkersButton] = todoTool({ components })
         todoContainer.current?.appendChild( todoButton )
         todoContainer.current?.appendChild( todoPriorityButton )
+        todoContainer.current?.appendChild( showMarkersButton )
+
+        todoCreator.onDisposed.add(()=>{
+            todoTable.data=[]
+            todoTable.remove()
+            todoButton.remove()
+            todoPriorityButton.remove()
+            showMarkersButton.remove()
+        })
     }, [])
     
     return (

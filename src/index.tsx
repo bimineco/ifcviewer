@@ -33,6 +33,7 @@ declare global{
             "bim-table": any;
             "bim-dropdown": any;
             "bim-option": any;
+            
         }
     }
 }

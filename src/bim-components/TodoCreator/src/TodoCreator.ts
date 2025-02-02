@@ -1,19 +1,32 @@
 import * as OBC from "@thatopen/components"
 import * as OBCF from "@thatopen/components-front"
+import * as BUI from "@thatopen/ui"
 import * as THREE from "three"
 import { TodoData, TodoInput } from "./base-types"
+import { UUID } from "@thatopen/components"
 
-export class TodoCreator extends OBC.Component {
+export class TodoCreator extends OBC.Component implements OBC.Disposable{
     static uuid = "fe04ded6-f563-472b-8d4c-467c308320cd"
     enabled = true
     private _world: OBC.World
     private _list: TodoData[] = []
+    private _markers: {[id: string]: OBCF.Mark} = {}
+
     onTodoCreated = new OBC.Event<TodoData>()
+    onDisposed: OBC.Event<any> = new OBC.Event()
+    onTodoDeleted = new OBC.Event<string>();
 
     constructor(components: OBC.Components) {
         super(components)
         this.components.add(TodoCreator.uuid, this)
     }
+
+    async dispose() {
+        this.enabled=false
+        this._list = []
+        this.onDisposed.trigger()
+    }
+
     setup() {
         const highlighter = this.components.get(OBCF.Highlighter)
         highlighter.add(`${TodoCreator.uuid}-priority-Baja`, new THREE.Color(0x59bc59))
@@ -38,6 +51,7 @@ export class TodoCreator extends OBC.Component {
     }
 
     async addTodo(data: TodoInput) {
+        if (!this.enabled) return
         const fragments = this.components.get(OBC.FragmentsManager)
         const highlighter = this.components.get(OBCF.Highlighter)
         const guids = fragments.fragmentIdMapToGuids(highlighter.selection.selectEvent) //IFCVIEWER
@@ -61,13 +75,15 @@ export class TodoCreator extends OBC.Component {
             camera: {
                 position,
                 target,
-            }
+            },
+            id: UUID.create(),
         }
         this._list.push(todoData)
         this.onTodoCreated.trigger(todoData)
         }
-        
+    
     async highlightTodo(todo: TodoData) {
+        if (!this.enabled) return
         const fragments = this.components.get(OBC.FragmentsManager)
         const fragmentIdMap = fragments.guidToFragmentIdMap(todo.ifcGuids)
         const highlighter = this.components.get(OBCF.Highlighter)
@@ -92,4 +108,76 @@ export class TodoCreator extends OBC.Component {
             true
         )
     }
+
+    deleteTodo(id: string) {
+        if (!this.enabled) return
+            
+        const todoExists = this._list.some((t) => t.id === id);
+        if (!todoExists) {
+        console.warn(`No se ha encontrado el todo con el id proporcionado: ${id}`)
+        return
+        }
+    
+        this._list = this._list.filter((t) => t.id !== id);
+        this.onTodoDeleted.trigger(id);
     }
+    
+    addTodoMaker(todoId: string, singleMarker: boolean = true) {
+        if (!this.enabled) return
+
+        const todo = this._list.find((t) => t.id === todoId)
+        if (!todo) return
+
+        if (todo.ifcGuids.length === 0) return
+
+        if (singleMarker && this._markers[todoId]) {
+            this._markers[todoId].dispose()
+            delete this._markers[todoId]
+            return
+        } else if (this._markers[todoId]) {
+            return
+        }
+
+        const fragments = this.components.get(OBC.FragmentsManager)
+        const fragmentIdMap = fragments.guidToFragmentIdMap(todo.ifcGuids)
+        const boundingBoxer = this.components.get(OBC.BoundingBoxer)
+        boundingBoxer.addFragmentIdMap(fragmentIdMap)
+        const { center } = boundingBoxer.getSphere()
+        boundingBoxer.reset()
+
+        const label = BUI.Component.create<BUI.Label>(() => {
+            return BUI.html `
+                <bim-label
+                    @mouseover=${() => {
+                        const highlighter = this.components.get(OBCF.Highlighter)
+                        highlighter.highlightByID("hoverEvent", fragmentIdMap, true, false) // Como en el IFCViewer
+                    }}
+                    style="background-color: var(--bim-ui_bg-contrast-100); cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 999px; pointer-events: auto;"
+                    icon="fa:map-marker"
+                ></bim-label>
+            `
+        })
+        const marker = new OBCF.Mark(this._world, label)
+        marker.three.position.copy(center)
+        this._markers[todo.id] = marker
+        
+    }  
+    set enableMarkers(value: boolean) {
+        if (!this.enabled) return
+        
+        if (value) {
+
+            for (const todo of this._list) {
+                this.addTodoMaker(todo.id, false)
+            }
+            
+        } else {
+            for (const [id, mark] of Object.entries(this._markers)) {
+                mark.dispose()
+                delete this._markers[id]
+            }
+            
+        }
+    }
+
+}
