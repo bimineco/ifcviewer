@@ -10,6 +10,7 @@ import {FragmentsGroup, IfcProperties} from '@thatopen/fragments'
 
 //TODOCREATOR
 import { TodoCreator } from "../bim-components/TodoCreator";
+import { SimpleQtO } from '../bim-components/SimpleQTO'
 
 interface Props{
     components: OBC.Components
@@ -79,14 +80,14 @@ export function IFCViewer(props: Props){
 
         const highlighter = components.get(OBCF.Highlighter)
         highlighter.setup({ 
-        selectName: "selectEvent", // Cuidado que al cambiar esto ya no vale lo que explica JH.
-        selectEnabled: true,
-        hoverName: "hoverEvent",
-        hoverEnabled: true,
-        selectionColor: new THREE.Color(0xff0000),  
-        hoverColor: new THREE.Color('#6B96CF'),     
-        autoHighlightOnClick: true,
-        world: world,
+            selectName: "selectEvent", // Cuidado que al cambiar esto ya no vale lo que explica JH.
+            selectEnabled: true,
+            hoverName: "hoverEvent",
+            hoverEnabled: true,
+            selectionColor: new THREE.Color(0xff0000),  
+            hoverColor: new THREE.Color('#6B96CF'),     
+            autoHighlightOnClick: true,
+            world: world,
         })
         
         highlighter.zoomToSelection=true
@@ -124,11 +125,18 @@ export function IFCViewer(props: Props){
             })
             
             const highlighter = components.get(OBCF.Highlighter)
-            highlighter.events.selectEvent.onHighlight.add((fragmentIdMap) => { 
+
+            /*SIMPLE QTO*/
+            const simpleQTO = components.get(SimpleQtO)
+
+            highlighter.events.selectEvent.onHighlight.add(async (fragmentIdMap) => { // Quitar el async si no está el QTO
                 if(!floatingGrid) return
                 floatingGrid.layout="secondary"
                 updatePropsTable({fragmentIdMap})
                 propsTable.expanded = false
+
+                await simpleQTO.sumQuantities(fragmentIdMap)
+                await simpleQTO.sumQuantitiesV2(fragmentIdMap)
             })
             highlighter.events.selectEvent.onClear.add(() => {
                 updatePropsTable({fragmentIdMap: {} })

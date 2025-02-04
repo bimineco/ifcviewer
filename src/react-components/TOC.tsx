@@ -75,7 +75,6 @@ export function TOC(props: Props) {
             Acciones: (_, rowData) => {
                 return BUI.html`
                     <div style="display: flex; gap: 8px;">
-                        
                         <bim-button 
                             @click=${() => {
                                 const id = rowData.Id
@@ -90,11 +89,18 @@ export function TOC(props: Props) {
                                 todoCreator.addTodoMaker(id as string, true)}}
                             icon="ion:navigate"
                         ></bim-button>
+                        <bim-button
+                            @click=${() => {
+                                
+                            }}
+                            icon="pajamas:abuse"
+                        ></bim-button>
                     </div>
                 `
             }
         }
         todoTable.hiddenColumns = ["Guids","Camera", "Id"];
+        
     }
 
     const todoCreator = components.get(TodoCreator)
@@ -119,131 +125,6 @@ export function TOC(props: Props) {
     
     return (
         <div className="page" id="project-details" data-project-id="">
-            <dialog id="edit-project-details">
-                <form id="edit-project-form">
-                    <h2 style={{ textAlign: "center" }}>Editar Proyecto</h2>
-                    <div className="input-list">
-                        <div className="form-field-container">
-                        <label>Nombre</label>
-                        <input
-                            name="name"
-                            type="text"
-                            defaultValue= {project.name}
-                            placeholder="Nombre del proyecto"
-                        />
-                        </div>
-                        <div className="form-field-container">
-                        <label>Código</label>
-                        <input
-                            name="code"
-                            type="text"
-                            defaultValue= {project.code}
-                            placeholder="Código del proyecto"
-                        />
-                        </div>
-                        <div className="form-field-container">
-                        <label>Descripción</label>
-                        <textarea
-                            name="description"
-                            defaultValue={project.description}
-                        />
-                        </div>
-                        <div className="form-field-container">
-                            <label>Tipo</label>
-                            <select name="type" defaultValue={project.type}>
-                                <option value="Implantación Interna" >Implantación Interna</option>
-                                <option value="Implantación Externa" >Implantación Externa</option>
-                                <option value="Desarrollo de Proyecto" >Desarrollo de Proyecto</option>
-                                <option value="Asistencia Técnica" >Asistencia Técnica</option>
-                            </select>
-                        </div>
-                        <div className="form-field-container">
-                            <label>Estado</label>
-                            <select name="status" defaultValue={project.status}>
-                                <option value="Oferta" >Oferta</option>
-                                <option value="Pendiente" >Pendiente</option>
-                                <option value="Activa" >Activa</option>
-                                <option value="Entregada" >Entregada</option>
-                                <option value="Finalizada" >Finalizada</option>
-                            </select>
-                        </div>
-                        <div className="form-field-container">
-                            <label>Presupuesto</label>
-                            <input name="budget" type="text" defaultValue={`${project.budget} €`} />
-                        </div>
-                        <div className="form-field-container">
-                            <label>Fecha de Finalización</label>
-                            <input name="date" type="date" defaultValue={'18/02/2025'} />
-                        </div>
-                        <div className="form-field-container">
-                            <label>Progreso</label>
-                            <input name="progress" type="text" defaultValue={`${project.progress} %`}/>
-                        </div>
-                        <div style={{ display: "flex", margin: "10px 0px 10px auto", columnGap: 15 }}>
-                            <button
-                            id="cancel-edit-btn"
-                            type="button"
-                            style={{
-                                backgroundColor: "transparent",
-                                color: "var(--complementary-light)"
-                            }}
-                            >
-                            Cancelar
-                            </button>
-                            <button
-                            type="submit"
-                            style={{ backgroundColor: "var(--complementary-light)" }}
-                            >
-                            Guardar Cambios
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </dialog>
-            <dialog id="error-dialog">
-                <form
-                id="custom-error"
-                style={{ backgroundColor: "var(--complementary-light)" }}
-                >
-                <div
-                    style={{
-                    padding: 15,
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center"
-                    }}
-                >
-                    <span style={{ fontSize: 40 }} className="material-symbols-outlined">
-                    warning
-                    </span>
-                    <h2 style={{ padding: "0px 15px 0px 15px", borderBottom: 0 }}>Error</h2>
-                </div>
-                <div style={{ padding: 15 }}>
-                    <p id="error-msg">Error Text</p>
-                </div>
-                <div
-                    style={{
-                    padding: 15,
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "center"
-                    }}
-                >
-                    <button
-                    id="accept-btn-error"
-                    type="button"
-                    style={{
-                        backgroundColor: "var(--complementary-dark)",
-                        color: "var(--complementary-light)",
-                        border: "none",
-                        outline: "none"
-                    }}
-                    >
-                    Aceptar
-                    </button>
-                </div>
-                </form>
-            </dialog>
             <header style={{ display: "flex", flexDirection: "column", padding: 0 }}>
                 <h2 data-project-info="name">{project.name}</h2>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
@@ -258,7 +139,7 @@ export function TOC(props: Props) {
             <div className="main-page-content" style={{ display: "flex", gap: 20 }}>
                 <div
                     style={{
-                    flexBasis: "60%",
+                    flexBasis: "35%",
                     display: "flex",
                     flexDirection: "column",
                     rowGap: 30
@@ -353,7 +234,7 @@ export function TOC(props: Props) {
                             justifyContent: "space-between"
                         }}
                         >
-                            <bim-label style={{fontSize: "var(--font-lg", color: "#fff"}}>To-Do</bim-label>
+                            <bim-label style={{fontSize: "var(--font-lg)", color: "#fff", paddingRight: "15px", alignItems: "center"}}>Tarea</bim-label>
                             <div
                                 style={{
                                 display: "flex",
@@ -367,13 +248,13 @@ export function TOC(props: Props) {
                                 style={{ display: "flex", alignItems: "center", columnGap: 10 }}
                                 >
                                     <bim-label icon="material-symbols:search" style={{ color: "#fff" }}></bim-label>
-                                    <bim-text-input placeholder="Search To-Do's by name"></bim-text-input>
+                                    <bim-text-input placeholder="Busqueda..."></bim-text-input>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style={{ flexBasis: "50%" }}>
+                <div style={{ flexBasis: "65%" }}>
                     < IFCViewer components={components} />
                 </div>
                 
