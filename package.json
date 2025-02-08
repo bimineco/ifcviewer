@@ -13,16 +13,26 @@
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.2.1",
+    "@types/react": "18.2.31",
+    "@types/react-dom": "18.2.14",
+    "@types/three": "0.156.0",
+    "@vitejs/plugin-react": "4.0.3",
     "rollup": "^2.70.2",
     "typescript": "^5.5.4",
-    "vite": "^5.4.2"
+    "vite": "^4.2.0"
   },
   "dependencies": {
-    "dexie": "^3.2.2",
-    "dxf-writer": "^1.17.1",
-    "three": "^0.135.0",
+    "@thatopen/components": "~2.3.13",
+    "@thatopen/components-front": "~2.3.8",
+    "@thatopen/fragments": "~2.3.0",
+    "@thatopen/ui": "~2.3.0",
+    "@thatopen/ui-obc": "~2.3.2",
+    "firebase": "10.5.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.18.0",
+    "three": "^0.160.1",
     "uuid": "^10.0.0",
-    "web-ifc": "^0.0.35",
-    "web-ifc-viewer": "^1.0.207"
+    "web-ifc": "^0.0.59"
   }
 }

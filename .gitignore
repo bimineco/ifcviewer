@@ -1,1 +1,3 @@
 node_modules/
+models/gear
+src/firebase/index.ts
