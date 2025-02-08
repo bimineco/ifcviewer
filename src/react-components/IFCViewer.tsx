@@ -10,22 +10,25 @@ import {FragmentsGroup, IfcProperties} from '@thatopen/fragments'
 
 //TODOCREATOR
 import { TodoCreator } from "../bim-components/TodoCreator";
-import { SimpleQtO } from '../bim-components/SimpleQTO'
+//import { SimpleQto } from '../bim-components/SimpleQTO'
+import { ViewerPanel } from '../bim-components/ViewerPanel'
 
 interface Props{
     components: OBC.Components
 }
 
+
 export function IFCViewer(props: Props){
     let fragmentModel: FragmentsGroup | undefined
     const components : OBC.Components = props.components
     
+    const viewerPanelRef = React.useRef<ViewerPanel | null>(null);
+    const [visorActive, setVisorActive] = React.useState(false)
+
     const [classificationsTree, updateClassificationsTree] = CUI.tables.classificationTree({
         components,
         classifications: []
     })
-
-    let highlighter
     const setViewer = () =>{
     
         const worlds = components.get(OBC.Worlds)
@@ -103,7 +106,14 @@ export function IFCViewer(props: Props){
         const todoCreator = components.get(TodoCreator)
         todoCreator.world = world
         todoCreator.setup()
+
+        //VIEWERPANEL
+        const viewerPanel = components.get(ViewerPanel);
+        viewerPanel.world = world
+        viewerPanelRef.current = viewerPanel
     }
+
+    const [showProperties, setShowProperties] = React.useState(false);
     const setupUI = () => {
         const viewerContainer = document.getElementById("viewer-container") as HTMLElement
         if(!viewerContainer) return
@@ -118,6 +128,17 @@ export function IFCViewer(props: Props){
             `
         })
 
+        const onToggleProperties = () => {
+            setShowProperties((prevShowProperties) => {
+                const newShowProperties = !prevShowProperties;
+                if (floatingGrid) {
+                    floatingGrid.layout = newShowProperties ? "secondary" : "main";
+                }
+                return newShowProperties;
+            });
+        };
+
+
         const elementPropertyPanel = BUI.Component.create<BUI.Panel>(()=>{
             const [propsTable, updatePropsTable] = CUI.tables.elementProperties({
                 components,
@@ -127,21 +148,19 @@ export function IFCViewer(props: Props){
             const highlighter = components.get(OBCF.Highlighter)
 
             /*SIMPLE QTO*/
-            const simpleQTO = components.get(SimpleQtO)
+            //const simpleQTO = components.get(SimpleQto)
 
             highlighter.events.selectEvent.onHighlight.add(async (fragmentIdMap) => { // Quitar el async si no está el QTO
                 if(!floatingGrid) return
-                floatingGrid.layout="secondary"
+                //floatingGrid.layout="secondary"
                 updatePropsTable({fragmentIdMap})
                 propsTable.expanded = false
 
-                await simpleQTO.sumQuantities(fragmentIdMap)
-                await simpleQTO.sumQuantitiesV2(fragmentIdMap)
             })
             highlighter.events.selectEvent.onClear.add(() => {
                 updatePropsTable({fragmentIdMap: {} })
                 if(!floatingGrid) return
-                floatingGrid.layout="main"
+                //floatingGrid.layout="main"
             })
         
             const search = (e: Event) => {
@@ -150,7 +169,7 @@ export function IFCViewer(props: Props){
             }
 
             return BUI.html`
-            <bim-panel>
+            <bim-panel ${showProperties ? "" : "hidden"}>
                 <bim-panel-section
                     name="Información"
                     label="Propiedades"
@@ -163,6 +182,7 @@ export function IFCViewer(props: Props){
             </bim-panel>
             `
         })
+
         const onClassifier = () => {
             if (!floatingGrid) return
             if (floatingGrid.layout !== "classifier") {
@@ -269,7 +289,7 @@ export function IFCViewer(props: Props){
                         <bim-button 
                             tooltip-title="Mostrar"
                             icon="clarity:list-line"
-                            @click=${onShowProperties}
+                            @click=${onToggleProperties}
                         ></bim-button>
                         <bim-button
                             tooltip-title="Importar"
@@ -287,6 +307,14 @@ export function IFCViewer(props: Props){
                         tooltip-title="Mostrar"
                         icon="tabler:eye-filled"
                         @click=${onClassifier}
+                    ></bim-button>
+                    <bim-button 
+                        tooltip-title="Panel en el Visor"
+                        icon="pajamas:comment-dots"
+                        @click=${()=>{
+                            console.log('Evento @click ejecutado')
+                            onVisor()
+                        }}
                     ></bim-button>
                 </bim-toolbar-section>
                 </bim-toolbar>
@@ -474,6 +502,29 @@ export function IFCViewer(props: Props){
         const hider = components.get(OBC.Hider)
         hider.set(true)
     }
+
+    const onVisor = () => {
+        setVisorActive((prevState) => {
+            const newState = !prevState;
+            console.log(newState ? "Activando panel..." : "Desactivando panel...");
+    
+            if (viewerPanelRef.current) {
+                if (newState) {
+                    viewerPanelRef.current.addTable();
+                } else {
+                    viewerPanelRef.current.removeTable();
+                    viewerPanelRef.current.stopAddingTables();
+                }
+            }
+    
+            return newState;
+        });
+    };
+    
+    React.useEffect(() => {
+        console.log("status: ", visorActive);
+    }, [visorActive]);
+
     const onShowProperties = async () =>{
         if(!fragmentModel){return}
         const highlighter = components.get(OBCF.Highlighter)
@@ -487,19 +538,19 @@ export function IFCViewer(props: Props){
                 if (psets){
                     for (const expressId of psets){
                         const prop = await fragmentModel.getProperties(expressId)
-                        console.log(prop)
+                        /*console.log(prop)*/
                     }
                 }
             }
         }
+        
     }
-    
+
         React.useEffect(() => {
             setTimeout(() => {
                 setViewer()
                 setupUI()
             })
-
 
             return () =>{
                 const highlighter = components.get(OBCF.Highlighter)

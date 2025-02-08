@@ -17,6 +17,8 @@
   --font-2xl: 20px;
   --font-3xl: 22px;
 
+  --sidebar-width: 350px;
+
   --normal-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
   --blur-filter: blur(8px);
 }
@@ -42,7 +44,7 @@ bim-text-input#search-input:hover{
 
 #app{
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-areas: 'sidebar content';
     height: 100vh;
     background-color: white;
@@ -117,12 +119,19 @@ button:hover {
 #sidebar{
   height: 100vh;
   background-color: var(--background-blue);
-  padding: 25px;
+  padding: 25px 25px 0px 25px;
   display: flex;
   flex-direction: column;
-  row-gap: 40px;  
-
+  row-gap: 40px;
+  transition: width 0.5s;
 }
+
+#sidebar.oculto {
+  width: 75px;
+  padding: 0px;
+}
+
+
 #nav-buttons{
   display: flex;
   flex-direction: column;

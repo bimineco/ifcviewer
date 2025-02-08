@@ -47,7 +47,7 @@ export function TOC(props: Props) {
         row.addEventListener("mouseout", () => { 
             row.style.backgroundColor = originalColor;
         })
-        }
+    }
         
 
     const todoTable = BUI.Component.create<BUI.Table>(() => {
