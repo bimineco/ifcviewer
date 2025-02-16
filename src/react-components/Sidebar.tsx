@@ -65,6 +65,11 @@ export function Sidebar(){
                             Visor IFC
                         </Router.Link>
 
+                        <Router.Link to={`/cv`} className="button-main" id="comp-nav-btn">
+                            <span className="material-symbols-outlined">compare</span>
+                            Comparar
+                        </Router.Link>
+
                         <Router.Link to={`/toc`} className="button-main" id="toc-nav-btn">
                         <span className="material-symbols-outlined">labs</span>
                             Pruebas TOC

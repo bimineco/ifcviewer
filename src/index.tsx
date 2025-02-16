@@ -12,11 +12,13 @@ import * as OBC from '@thatopen/components'
 import { IFCViewer } from './react-components/IFCViewer';
 import { TOC } from './react-components/TOC';
 
-
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 import { Welcome } from './react-components/Welcome';
 
+
+import { IFCViewerOld } from './react-components/IFCViewerOld';
+import { IFCViewerToolbar } from "../BORRAR/IFCViewerToolbar";
 
 BUI.Manager.init()
 
@@ -55,7 +57,8 @@ onAuthStateChanged(auth, (user) => {
                     <Router.Route path="/" element={<ProjectPage projectsManager={projectsManager} />} />
                     <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} components={components} />} />
                     <Router.Route path="/users" element={<UserPage />} />
-                    <Router.Route path="/viewer" element={<IFCViewer components={components} />} />
+                    <Router.Route path="/viewer" element={<IFCViewerToolbar components={components} />} />
+                    <Router.Route path="/cv" element={<IFCViewerOld components={components} />} />
                     <Router.Route path="/toc" element={<TOC projectsManager={projectsManager} />} />
                 </Router.Routes>
             </Router.BrowserRouter>
