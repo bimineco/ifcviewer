@@ -3,8 +3,8 @@ import * as OBCF from "@thatopen/components-front";
 import * as BUI from "@thatopen/ui";
 import * as CUI from '@thatopen/ui-obc';
 import * as THREE from "three";
-import { AppManager } from "../../src/bim-components";
-import ProcessModel from '../../src/components/general/ProcessModel';
+import { AppManager } from "../../bim-components";
+import ProcessModel from '../general/ProcessModel';
 
 export default (components: OBC.Components) => {
 
@@ -13,7 +13,7 @@ export default (components: OBC.Components) => {
   let fragmentModel = appManager.fragmentModel
   const viewerPanelRef = appManager.viewerPanelRef
   
-  const onPopertyExport = async () => {
+  const onPropertyExport = async () => {
     if (!fragmentModel) return
     const exported = fragmentModel.getLocalProperties()
     const serialized = JSON.stringify(exported);
@@ -179,69 +179,61 @@ export default (components: OBC.Components) => {
     if (!world) return
     casters.get(world)
   
-    console.log(world.meshes)
     const clipper = components.get(OBC.Clipper)
-    console.log(clipper)
     clipper.enabled = true
     clipper.visible = true
+  
     const container = document.getElementById("viewer-container")
-    if (!container) return   
-    console.log("🔍 Objetos en la escena:");
-    
+    if (!container) return
+
     world.scene.three.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         console.log('Mesh encontrado en:', child);
       }
-    }); 
-    
-    container.ondblclick = () => {
+    });
+  
+    container.ondblclick = (event) => {
       console.log("Doble click detectado");
-      const result = world.meshes
-      if (result) {
-        console.log("¡Intersección detectada!", result);
-      } else {
-        console.log("No se detectó intersección.");
-      }
-    
-      const cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+      
+      /*const cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
       const cubeMaterial = new THREE.MeshStandardMaterial({ color: "#6528D7" });
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
       cube.position.set(0, 1.5, 0);
-      //world.scene.three.add(cube);
+      world.scene.three.add(cube);
       world.meshes.add(cube);
-      
-    
-      //console.log("Cubo agregado a la escena:", cube);
+      */
       console.log(world.meshes)
-    
+  
       if (clipper.enabled) {
         const plano = clipper.create(world);
         console.log("Clipper habilitado:", clipper.enabled);
         console.log("Plano creado:", plano);
       }
     };
-    
-    console.log(container)
+  
     window.onkeydown = (event) => {
       if (event.code === "Delete" || event.code === "Backspace") {
         if (clipper.enabled) {
           clipper.delete(world);
-
         }
       }
     };
-
+  
     components.init();
   };
+
   const handleCompare = () => {
-    
+    appManager.updateComparingActive(!appManager.state.isComparing)
+    console.log(appManager.state.isComparing)
   }
-  return BUI.Component.create<BUI.Toolbar>(() =>{
+
+  return BUI.Component.create<BUI.Toolbar>(() => {
+    console.log("ViewerToolbar")
     const [loadIfcBtn] = CUI.buttons.loadIfc({ components: components })
     loadIfcBtn.tooltipTitle = "Cargar IFC"
     loadIfcBtn.label = ""
     return BUI.html`
-      <bim-toolbar style="justify-self: center; margin-bottom: 20px">
+      <bim-toolbar style="justify-self: center; margin-bottom: 20px; height: 75px">
         <bim-toolbar-section label="App">
           <bim-button 
             tooltip-title="World" 
@@ -252,9 +244,9 @@ export default (components: OBC.Components) => {
         <bim-toolbar-section label="IFC">
           ${loadIfcBtn}
           <bim-button 
-          tooltip-title=${appManager.state.isComparing ? "Salir de comparación" : "Comparar modelos"}
-          icon=${appManager.state.isComparing ? "ph:arrows-out" : "pajamas:comparison"}
-          @click=${handleCompare}
+            tooltip-title=${appManager.state.isComparing ? "Salir de comparación" : "Comparar modelos"}
+            icon=${appManager.state.isComparing ? "ph:arrows-out" : "pajamas:comparison"}
+            @click=${handleCompare}
           ></bim-button>
         </bim-toolbar-section>
         <bim-toolbar-section label="Seleccionar">
@@ -322,7 +314,7 @@ export default (components: OBC.Components) => {
           <bim-button
             tooltip-title="Exportar"
             icon="clarity:export-line"
-            @click=${onPopertyExport}
+            @click=${onPropertyExport}
           ></bim-button>
         </bim-toolbar-section>
         <bim-toolbar-section label="Árbol">
@@ -335,6 +327,6 @@ export default (components: OBC.Components) => {
           ></bim-button>
         </bim-toolbar-section>
       </bim-toolbar>
-      `
-  })
+    `;
+  });
 }

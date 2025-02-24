@@ -22,17 +22,17 @@
     "vite": "^4.2.0"
   },
   "dependencies": {
-    "@thatopen/components": "~2.3.13",
-    "@thatopen/components-front": "~2.3.8",
-    "@thatopen/fragments": "~2.3.0",
-    "@thatopen/ui": "~2.3.0",
-    "@thatopen/ui-obc": "~2.3.2",
+    "@thatopen/components": "^2.4.4",
+    "@thatopen/components-front": "^2.4.4",
+    "@thatopen/fragments": "^2.4.0",
+    "@thatopen/ui": "^2.4.1",
+    "@thatopen/ui-obc": "^2.4.1",
     "firebase": "10.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.18.0",
     "three": "^0.160.1",
     "uuid": "^10.0.0",
-    "web-ifc": "^0.0.59"
+    "web-ifc": "^0.0.66"
   }
 }

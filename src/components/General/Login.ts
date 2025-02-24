@@ -51,7 +51,6 @@ interface LoginModalState {
         updateLoginModal?.({ registerError: error });
         }
     };
-    console.log("dentro de login")
     return BUI.html`
     <div style="display: flex; justify-content: center; align-items: center;">
         <bim-tabs style="width: 17rem; border-radius: 0.375rem;" switchers-full>

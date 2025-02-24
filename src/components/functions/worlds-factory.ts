@@ -53,6 +53,11 @@ export const createWorld = (
   worldGrid.material.uniforms.uSize2.value = 4//8;
 
   const resizeWorld = () => {
+    if (!world || !world.camera) {
+      console.error("resizeWorld: No se puede ejecutar, cámara no inicializada.");
+      return;
+    }
+    console.log("Cámara encontrada:", world.camera);
     world.renderer?.resize();
     world.camera.updateAspect();
   };

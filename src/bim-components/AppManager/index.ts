@@ -18,6 +18,8 @@ export class AppManager extends OBC.Component {
   updateClassificationsTree: ReturnType<typeof CUI.tables.classificationTree>[1]
   worldA : OBC.World | undefined
   worldB : OBC.World | undefined
+  viewportA : BUI.Viewport | undefined
+  viewportB : BUI.Viewport | undefined
 
 
   public state = {
@@ -55,6 +57,12 @@ export class AppManager extends OBC.Component {
   public updatePropertiesActive(newState:  boolean )  {
     this.state.propertiesActive = newState
   }
+
+  public updateComparingActive(newState:  boolean )  {
+    this.state.isComparing = newState
+  }
+
+
 
   readonly onUserLogin = new OBC.Event<User>();
   readonly onUserSignOut = new OBC.Event<undefined>();

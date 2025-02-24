@@ -58,7 +58,7 @@ onAuthStateChanged(auth, (user) => {
                     <Router.Route path="/project/:id" element={<ProjectDetailsPage projectsManager={projectsManager} components={components} />} />
                     <Router.Route path="/users" element={<UserPage />} />
                     <Router.Route path="/viewer" element={<IFCViewerToolbar components={components} />} />
-                    <Router.Route path="/cv" element={<IFCViewerOld components={components} />} />
+                    <Router.Route path="/cv" element={<IFCViewer components={components} />} />
                     <Router.Route path="/toc" element={<TOC projectsManager={projectsManager} />} />
                 </Router.Routes>
             </Router.BrowserRouter>
